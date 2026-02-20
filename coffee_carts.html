@@ -93,7 +93,16 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .btn-merge{background:rgba(46,204,113,0.8);color:#000;border:none;padding:10px 22px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;}
 .btn-cc{background:transparent;color:var(--muted);border:1px solid rgba(245,234,216,0.15);padding:10px 18px;border-radius:10px;font-family:'Heebo',sans-serif;font-size:0.9rem;cursor:pointer;}
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,14,0,0.95);border:1px solid var(--caramel);color:var(--cream);padding:10px 22px;border-radius:30px;font-size:0.88rem;z-index:500;white-space:nowrap;}
-.card-img[src="IMG_2464.jpeg"]{object-position:center 90%;transform:scale(2);transform-origin:center 90%;}
+.card-img[src="IMG_2464.jpeg"]{object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;}
+.img-gallery{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;}
+.img-thumb{width:50px;height:50px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:0.7;transition:all 0.2s;flex-shrink:0;}
+.img-thumb.is-main{border-color:var(--golden);opacity:1;}
+.img-thumb:hover{opacity:1;}
+.img-upload-lbl{width:50px;height:50px;border-radius:8px;border:1px dashed rgba(196,122,43,0.4);background:rgba(255,255,255,0.03);color:var(--muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
+.img-upload-lbl:hover{background:rgba(196,122,43,0.1);}
+.hours-label{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;margin-top:10px;}
+.hours-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;resize:none;height:56px;outline:none;direction:rtl;line-height:1.5;}
+.hours-area::placeholder{color:rgba(245,234,216,0.2);}
 </style>
 </head>
 <body>
@@ -159,11 +168,12 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 <script>
 var KEY = 'cafe_carts_v9';
 var INITIAL = [
-  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:center 90%;transform:scale(2);transform-origin:center 90%;", notes:"", rating:0, visited:false, unknown:false},
+  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;", notes:"", rating:0, visited:false, unknown:false},
   {id:2, name:"Cafe Tiran", sub:"קפה טירן", location:"רח׳ קדושי השואה 56\nהרצליה פיתוח", ig:"https://www.instagram.com/cafe_tiran/", waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes", img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:3, name:"דשא גדול", sub:"Deshe Gadol", location:"מושב חרות\nעמק חפר", ig:"https://www.instagram.com/deshe_gadol/", waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes", img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:4, name:"אוטוטו", sub:"Ottoto — גינת גרונימן", location:"גינת גרונימן\nרמת אביב, תל אביב", ig:"https://www.instagram.com/reel/DUcp9R1Apf8/", waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes", img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
@@ -284,6 +294,14 @@ function renderGrid(data) {
     var wazeQ = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
     if (c.waze) footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
     if (wazeQ) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ + '\')">🗺 Maps</a>';
+    var extras = Array.isArray(c.extraImages) ? c.extraImages : [];
+    var galleryHtml = '<div class="img-gallery">'
+      + (c.img ? '<img class="img-thumb is-main" src="' + c.img + '" title="תמונה ראשית">' : '')
+      + extras.map(function(u) {
+          return '<img class="img-thumb" src="' + u + '" onclick="setMainImg(' + c.id + ',\'' + u.replace(/'/g,"\\'") + '\')" title="הגדר כראשית">';
+        }).join('')
+      + '<label class="img-upload-lbl" title="הוסף תמונה">📷<input type="file" accept="image/*" style="display:none" onchange="uploadImg(' + c.id + ',this)"></label>'
+      + '</div>';
     el.innerHTML =
       '<div class="card-img-wrap">'
         + imgHtml
@@ -291,10 +309,13 @@ function renderGrid(data) {
       + '</div>'
       + '<div class="card-body">'
         + bodyHtml
-        + '<div class="rating-row"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
+        + galleryHtml
+        + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
-        + '<div class="notes-label">הערות אישיות</div>'
-        + '<textarea class="notes-area" placeholder="מה אהבת? שעות, מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
+        + '<div class="hours-label">שעות פתיחה</div>'
+        + '<textarea class="hours-area" placeholder="א-ה: 07:00-17:00&#10;שישי: 07:00-13:00" onchange="upHours(' + c.id + ',this.value)">' + (c.hours||'') + '</textarea>'
+        + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
+        + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
         + '<div class="card-footer">'
           + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + footerLinks
@@ -385,6 +406,43 @@ function upLoc(id, v) {
   if (c) { c.location = v; save(d); }
 }
 
+function upHours(id, v) {
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (c) { c.hours = v; save(d); }
+}
+
+function setMainImg(id, url) {
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c || !url) return;
+  if (!c.extraImages) c.extraImages = [];
+  if (c.img) c.extraImages.push(c.img);
+  c.extraImages = c.extraImages.filter(function(u) { return u !== url; });
+  c.img = url;
+  c.imgStyle = '';
+  save(d); render();
+}
+
+function uploadImg(id, input) {
+  var file = input.files[0];
+  if (!file) return;
+  showToast('⏳ מעלה תמונה...');
+  var storageRef = firebase.storage().ref('carts/' + id + '/' + Date.now() + '_' + file.name);
+  storageRef.put(file).then(function(snap) {
+    return snap.ref.getDownloadURL();
+  }).then(function(url) {
+    var d = load();
+    var c = d.find(function(x) { return x.id === id; });
+    if (!c) return;
+    if (!c.extraImages) c.extraImages = [];
+    c.extraImages.push(url);
+    save(d); render();
+    showToast('✅ תמונה הועלתה!');
+  }).catch(function() { showToast('❌ שגיאת העלאה'); });
+  input.value = '';
+}
+
 // DELETE
 function askDelete(id) {
   pendingDelId = id;
@@ -447,29 +505,17 @@ firebase.initializeApp({
 
 dbRef = firebase.database().ref('carts');
 
-// ── Debug indicator ──
-var dbg = document.createElement('div');
-dbg.id = 'fb-debug';
-dbg.style = 'position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;z-index:9999;direction:ltr;';
-dbg.textContent = '⏳ Firebase: connecting...';
-document.body.appendChild(dbg);
-
-firebase.database().ref('.info/connected').on('value', function(snap) {
-  dbg.textContent = snap.val() ? '✅ Firebase: connected' : '❌ Firebase: disconnected';
-});
-
 dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
   if (!raw) {
-    dbg.textContent += ' | writing initial...';
-    dbRef.set(INITIAL).then(function(){ dbg.textContent += ' ✓'; }).catch(function(e){ dbg.textContent += ' ERR: ' + e.message; });
+    dbRef.set(INITIAL).catch(function() { showToast('❌ שגיאת שמירה'); });
     return;
   }
   var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
   // Migration: ensure Shulke has correct imgStyle
   var shulke = d.find(function(x) { return x.id === 1; });
-  if (shulke && shulke.imgStyle !== 'object-position:center 90%;transform:scale(2);transform-origin:center 90%;') {
-    shulke.imgStyle = 'object-position:center 90%;transform:scale(2);transform-origin:center 90%;';
+  if (shulke && shulke.imgStyle !== 'object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;') {
+    shulke.imgStyle = 'object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;';
     delete shulke.imgPos;
     dbRef.set(d);
     return;
