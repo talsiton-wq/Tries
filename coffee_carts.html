@@ -192,7 +192,14 @@ var pendingImport = null;
 var toastTimer = null;
 
 function load() {
-  try { var s = localStorage.getItem(KEY); return s ? JSON.parse(s) : INITIAL; } catch(e) { return INITIAL; }
+  try {
+    var s = localStorage.getItem(KEY);
+    if (!s) return INITIAL;
+    var d = JSON.parse(s);
+    var shulke = d.find(function(x) { return x.id === 1; });
+    if (shulke && !shulke.imgPos) { shulke.imgPos = 'center 70%'; save(d); }
+    return d;
+  } catch(e) { return INITIAL; }
 }
 function save(d) {
   try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {}
