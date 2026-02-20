@@ -141,9 +141,23 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
     <input type="text" id="f-img" placeholder="https://..." />
     <div class="field-label">קישור Waze</div>
     <input type="text" id="f-waze" placeholder="https://waze.com/ul?q=..." />
+    <div class="field-label">שעות פתיחה</div>
+    <input type="text" id="f-hours" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" />
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
       <button class="btn-add" onclick="addCart()">הוסף ☕</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOURS EDIT MODAL -->
+<div class="confirm-overlay" id="hours-overlay">
+  <div class="confirm-box" style="text-align:right">
+    <h3>🕐 שעות פתיחה</h3>
+    <input id="f-hours-edit" type="text" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.9rem;margin:12px 0;outline:none;direction:rtl;">
+    <div class="confirm-btns">
+      <button class="btn-cc" onclick="closeHoursModal()">ביטול</button>
+      <button class="btn-ok" onclick="doSaveHours()">שמור</button>
     </div>
   </div>
 </div>
@@ -310,7 +324,10 @@ function renderGrid(data) {
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
-        + (c.hours ? '<div class="cart-hours">🕐 <span>' + (c.hours||'').replace(/\n/g,'<br>') + '</span></div>' : '')
+        + '<div class="cart-hours">🕐 '
+          + (c.hours ? '<span>' + (c.hours||'').replace(/\n/g,'<br>') + '</span>' : '<span style="opacity:0.3">—</span>')
+          + ' <button onclick="askEditHours(' + c.id + ')" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;padding:0 4px;opacity:0.5">✏️</button>'
+          + '</div>'
         + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
         + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
         + '<div class="card-footer">'
@@ -403,6 +420,24 @@ function upLoc(id, v) {
   if (c) { c.location = v; save(d); }
 }
 
+var pendingHoursId = null;
+function askEditHours(id) {
+  pendingHoursId = id;
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  document.getElementById('f-hours-edit').value = (c && c.hours) || '';
+  document.getElementById('hours-overlay').classList.add('open');
+}
+function closeHoursModal() { document.getElementById('hours-overlay').classList.remove('open'); pendingHoursId = null; }
+function doSaveHours() {
+  if (!pendingHoursId) return;
+  var v = document.getElementById('f-hours-edit').value.trim();
+  var d = load();
+  var c = d.find(function(x) { return x.id === pendingHoursId; });
+  if (c) { c.hours = v; save(d); render(); }
+  closeHoursModal();
+}
+
 function setMainImg(id, url) {
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
@@ -453,7 +488,7 @@ function doDelete() {
 function openAddModal() { document.getElementById('add-overlay').classList.add('open'); }
 function closeAddModal() {
   document.getElementById('add-overlay').classList.remove('open');
-  ['f-name','f-loc','f-ig','f-img','f-waze'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-name','f-loc','f-ig','f-img','f-waze','f-hours'].forEach(function(id) { document.getElementById(id).value = ''; });
 }
 function addCart() {
   var name = document.getElementById('f-name').value.trim();
@@ -465,6 +500,7 @@ function addCart() {
     ig: document.getElementById('f-ig').value.trim(),
     img: document.getElementById('f-img').value.trim(),
     waze: document.getElementById('f-waze').value.trim(),
+    hours: document.getElementById('f-hours').value.trim(),
     notes: '', rating: 0, visited: false, unknown: false
   });
   save(d); closeAddModal(); render();
@@ -482,6 +518,7 @@ function showToast(msg) {
 // CLOSE ON BG CLICK
 document.getElementById('add-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeAddModal(); });
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
+document.getElementById('hours-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeHoursModal(); });
 
 // ── Firebase init ──────────────────────────────────────────────
 firebase.initializeApp({
