@@ -509,9 +509,24 @@ firebase.initializeApp({
 
 dbRef = firebase.database().ref('carts');
 
+// ── Debug indicator ──
+var dbg = document.createElement('div');
+dbg.id = 'fb-debug';
+dbg.style = 'position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;z-index:9999;direction:ltr;';
+dbg.textContent = '⏳ Firebase: connecting...';
+document.body.appendChild(dbg);
+
+firebase.database().ref('.info/connected').on('value', function(snap) {
+  dbg.textContent = snap.val() ? '✅ Firebase: connected' : '❌ Firebase: disconnected';
+});
+
 dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
-  if (!raw) { dbRef.set(INITIAL); return; }
+  if (!raw) {
+    dbg.textContent += ' | writing initial...';
+    dbRef.set(INITIAL).then(function(){ dbg.textContent += ' ✓'; }).catch(function(e){ dbg.textContent += ' ERR: ' + e.message; });
+    return;
+  }
   var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
   // Migration: ensure Shulke has correct imgStyle
   var shulke = d.find(function(x) { return x.id === 1; });
