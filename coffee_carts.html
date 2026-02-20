@@ -100,7 +100,10 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .img-thumb:hover{opacity:1;}
 .img-upload-lbl{width:50px;height:50px;border-radius:8px;border:1px dashed rgba(196,122,43,0.4);background:rgba(255,255,255,0.03);color:var(--muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
 .img-upload-lbl:hover{background:rgba(196,122,43,0.1);}
-.cart-hours{font-size:0.8rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:flex-start;gap:4px;line-height:1.6;white-space:pre-line;}
+.cart-hours{font-size:0.8rem;color:var(--cream);margin-bottom:10px;display:flex;align-items:center;gap:5px;line-height:1.6;flex-wrap:wrap;}
+.cart-hours .hours-text{color:var(--cream);opacity:0.85;}
+.cart-hours .hours-empty{color:var(--muted);font-style:italic;}
+.cart-hours .edit-hours-btn{background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -325,8 +328,10 @@ function renderGrid(data) {
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
         + '<div class="cart-hours">🕐 '
-          + (c.hours ? '<span>' + (c.hours||'').replace(/\n/g,'<br>') + '</span>' : '<span style="opacity:0.3">—</span>')
-          + ' <button onclick="askEditHours(' + c.id + ')" style="background:none;border:none;color:var(--muted);font-size:0.7rem;cursor:pointer;padding:0 4px;opacity:0.5">✏️</button>'
+          + (c.hours
+              ? '<span class="hours-text">' + (c.hours).replace(/\n/g,'<br>') + '</span>'
+              : '<span class="hours-empty">שעות לא הוגדרו</span>')
+          + '<button class="edit-hours-btn" onclick="askEditHours(' + c.id + ')" title="ערוך שעות">✏️</button>'
           + '</div>'
         + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
         + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
