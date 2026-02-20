@@ -104,6 +104,9 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .cart-hours .hours-text{color:var(--cream);opacity:0.85;}
 .cart-hours .hours-empty{color:var(--muted);font-style:italic;}
 .cart-hours .edit-hours-btn{background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;}
+.open-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:12px;margin-bottom:8px;}
+.open-badge.open{background:rgba(46,204,113,0.12);color:#2ecc71;border:1px solid rgba(46,204,113,0.3);}
+.open-badge.closed{background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid rgba(231,76,60,0.2);}
 </style>
 </head>
 <body>
@@ -211,6 +214,38 @@ var dbRef = null;
 
 function load() { return localData || INITIAL; }
 
+function isOpen(hours) {
+  if (!hours) return null;
+  var dayMap = {'א':0,'ב':1,'ג':2,'ד':3,'ה':4,'ו':5,'ש':6};
+  var now = new Date();
+  var today = now.getDay();
+  var curMin = now.getHours() * 60 + now.getMinutes();
+  var segments = hours.split('|');
+  for (var i = 0; i < segments.length; i++) {
+    var seg = segments[i].trim();
+    var col = seg.indexOf(':');
+    if (col < 0) continue;
+    var dayPart = seg.substring(0, col).replace(/׳/g,'').replace(/\s/g,'');
+    var timePart = seg.substring(col + 1).trim();
+    var days = [];
+    var dash = dayPart.indexOf('–');
+    if (dash >= 0) {
+      var s = dayMap[dayPart[0]], e = dayMap[dayPart[dayPart.length-1]];
+      if (s !== undefined && e !== undefined) for (var d = s; d <= e; d++) days.push(d);
+    } else {
+      if (dayMap[dayPart[0]] !== undefined) days.push(dayMap[dayPart[0]]);
+    }
+    if (days.indexOf(today) < 0) continue;
+    if (timePart.indexOf('סגור') >= 0) return false;
+    var m = timePart.match(/(\d{1,2}):(\d{2})[–\-](\d{1,2}):(\d{2})/);
+    if (!m) continue;
+    var open = parseInt(m[1])*60+parseInt(m[2]);
+    var close = parseInt(m[3])*60+parseInt(m[4]);
+    return curMin >= open && curMin < close;
+  }
+  return null;
+}
+
 function save(d) {
   localData = d;
   if (dbRef) dbRef.set(d).catch(function() { showToast('❌ שגיאת שמירה'); });
@@ -304,6 +339,10 @@ function renderGrid(data) {
       : '<div class="cart-name">' + (c.name||'') + '</div>'
         + (c.sub ? '<div class="cart-sub">' + c.sub + '</div>' : '')
         + '<div class="cart-location">📍 <span>' + locLines + '</span></div>';
+    var openStatus = isOpen(c.hours);
+    var openHtml = openStatus === null ? ''
+      : openStatus ? '<span class="open-badge open">🟢 פתוח עכשיו</span>'
+                   : '<span class="open-badge closed">🔴 סגור</span>';
     var footerLinks = '';
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
     var wazeQ = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
@@ -324,6 +363,7 @@ function renderGrid(data) {
       + '</div>'
       + '<div class="card-body">'
         + bodyHtml
+        + openHtml
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
