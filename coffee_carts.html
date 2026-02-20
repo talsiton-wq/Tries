@@ -170,6 +170,10 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 
 <div id="toast"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <script>
 var KEY = 'cafe_carts_v9';
 var INITIAL = [
@@ -191,19 +195,14 @@ var showOnlyVisited = false;
 var pendingDelId = null;
 var pendingImport = null;
 var toastTimer = null;
+var localData = null;
+var dbRef = null;
 
-function load() {
-  try {
-    var s = localStorage.getItem(KEY);
-    if (!s) return INITIAL;
-    var d = JSON.parse(s);
-    var shulke = d.find(function(x) { return x.id === 1; });
-    if (shulke && shulke.imgStyle !== 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;') { shulke.imgStyle = 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;'; delete shulke.imgPos; save(d); }
-    return d;
-  } catch(e) { return INITIAL; }
-}
+function load() { return localData || INITIAL; }
+
 function save(d) {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {}
+  localData = d;
+  if (dbRef) dbRef.set(d).catch(function() { showToast('❌ שגיאת שמירה'); });
 }
 
 function igLabel(url) {
@@ -497,7 +496,34 @@ document.getElementById('add-overlay').addEventListener('click', function(e) { i
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
 document.getElementById('imp-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeImpModal(); });
 
-render();
+// ── Firebase init ──────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:            "FILL_IN",
+  authDomain:        "FILL_IN.firebaseapp.com",
+  databaseURL:       "https://FILL_IN-default-rtdb.firebaseio.com",
+  projectId:         "FILL_IN",
+  storageBucket:     "FILL_IN.appspot.com",
+  messagingSenderId: "FILL_IN",
+  appId:             "FILL_IN"
+});
+
+dbRef = firebase.database().ref('carts');
+
+dbRef.on('value', function(snapshot) {
+  var raw = snapshot.val();
+  if (!raw) { dbRef.set(INITIAL); return; }
+  var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
+  // Migration: ensure Shulke has correct imgStyle
+  var shulke = d.find(function(x) { return x.id === 1; });
+  if (shulke && shulke.imgStyle !== 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;') {
+    shulke.imgStyle = 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;';
+    delete shulke.imgPos;
+    dbRef.set(d);
+    return;
+  }
+  localData = d;
+  render();
+});
 </script>
 </body>
 </html>
