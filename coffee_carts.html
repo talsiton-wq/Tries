@@ -34,8 +34,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card-img-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--roast),var(--medium));}
 .card-img-placeholder .big-emoji{font-size:3rem;}
 .unknown-badge{position:absolute;top:12px;left:12px;background:rgba(196,122,43,0.88);color:var(--espresso);font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:10px;}
-.delete-btn{position:absolute;bottom:12px;left:12px;background:rgba(231,76,60,0.15);border:1px solid rgba(231,76,60,0.35);color:rgba(231,76,60,0.7);cursor:pointer;font-size:0.72rem;font-weight:700;padding:5px 11px;border-radius:20px;display:flex;align-items:center;gap:4px;transition:all 0.2s;z-index:10;}
-.delete-btn:hover{background:rgba(231,76,60,0.3);color:var(--danger);}
+.delete-btn{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:rgba(231,76,60,0.6);cursor:pointer;font-size:0.72rem;font-weight:700;padding:5px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;}
+.delete-btn:hover{background:rgba(231,76,60,0.25);color:var(--danger);}
 .card-body{padding:16px;}
 .cart-name{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--golden);margin-bottom:3px;}
 .cart-sub{font-size:0.72rem;color:var(--muted);font-style:italic;margin-bottom:7px;}
@@ -93,7 +93,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .btn-merge{background:rgba(46,204,113,0.8);color:#000;border:none;padding:10px 22px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;}
 .btn-cc{background:transparent;color:var(--muted);border:1px solid rgba(245,234,216,0.15);padding:10px 18px;border-radius:10px;font-family:'Heebo',sans-serif;font-size:0.9rem;cursor:pointer;}
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,14,0,0.95);border:1px solid var(--caramel);color:var(--cream);padding:10px 22px;border-radius:30px;font-size:0.88rem;z-index:500;white-space:nowrap;}
-.card-img[src="IMG_2464.jpeg"]{object-position:center 85%;transform:scale(2);transform-origin:center 85%;}
+.card-img[src="IMG_2464.jpeg"]{object-position:center 95%;transform:scale(2);transform-origin:center 95%;}
 </style>
 </head>
 <body>
@@ -111,8 +111,6 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
   </div>
   <button class="filter-btn" id="filter-visited" onclick="toggleVisitedFilter()">✓ ביקרתי</button>
   <span class="count-badge" id="count">0 עגלות</span>
-  <button class="filter-btn" onclick="exportData()">📤 ייצא</button>
-  <label class="filter-btn" style="cursor:pointer">📥 ייבא<input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)"></label>
 </div>
 
 <div id="view-grid"><div class="grid" id="grid"></div></div>
@@ -155,18 +153,6 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
   </div>
 </div>
 
-<!-- IMPORT CONFIRM -->
-<div class="confirm-overlay" id="imp-overlay">
-  <div class="confirm-box">
-    <h3>📥 ייבוא רשימה</h3>
-    <p id="imp-msg"></p>
-    <div class="confirm-btns" style="flex-direction:column;align-items:stretch">
-      <button class="btn-ok" onclick="doImportReplace()">🔄 החלף את כל הרשימה</button>
-      <button class="btn-merge" onclick="doImportMerge()">➕ מזג — הוסף עגלות חדשות בלבד</button>
-      <button class="btn-cc" onclick="closeImpModal()">ביטול</button>
-    </div>
-  </div>
-</div>
 
 <div id="toast"></div>
 
@@ -177,7 +163,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 <script>
 var KEY = 'cafe_carts_v9';
 var INITIAL = [
-  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:center 85%;transform:scale(2);transform-origin:center 85%;", notes:"", rating:0, visited:false, unknown:false},
+  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:center 95%;transform:scale(2);transform-origin:center 95%;", notes:"", rating:0, visited:false, unknown:false},
   {id:2, name:"Cafe Tiran", sub:"קפה טירן", location:"רח׳ קדושי השואה 56\nהרצליה פיתוח", ig:"https://www.instagram.com/cafe_tiran/", waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes", img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:3, name:"דשא גדול", sub:"Deshe Gadol", location:"מושב חרות\nעמק חפר", ig:"https://www.instagram.com/deshe_gadol/", waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes", img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:4, name:"אוטוטו", sub:"Ottoto — גינת גרונימן", location:"גינת גרונימן\nרמת אביב, תל אביב", ig:"https://www.instagram.com/reel/DUcp9R1Apf8/", waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes", img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
@@ -302,7 +288,6 @@ function renderGrid(data) {
       '<div class="card-img-wrap">'
         + imgHtml
         + (c.unknown ? '<div class="unknown-badge">לא ידוע</div>' : '')
-        + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
       + '</div>'
       + '<div class="card-body">'
         + bodyHtml
@@ -313,6 +298,7 @@ function renderGrid(data) {
         + '<div class="card-footer">'
           + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + footerLinks
+          + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
         + '</div>'
       + '</div>';
     grid.appendChild(el);
@@ -435,53 +421,6 @@ function addCart() {
   save(d); closeAddModal(); render();
 }
 
-// EXPORT
-function exportData() {
-  var d = load();
-  var blob = new Blob([JSON.stringify(d, null, 2)], {type: 'application/json'});
-  var url = URL.createObjectURL(blob);
-  var a = document.createElement('a');
-  a.href = url;
-  a.download = 'עגלות_קפה.json';
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast('📤 הרשימה יוצאה בהצלחה!');
-}
-
-// IMPORT
-function importData(e) {
-  var file = e.target.files[0];
-  if (!file) return;
-  var reader = new FileReader();
-  reader.onload = function(ev) {
-    try {
-      var parsed = JSON.parse(ev.target.result);
-      if (!Array.isArray(parsed)) throw new Error('not array');
-      pendingImport = parsed;
-      var cur = load();
-      var newCount = parsed.filter(function(x) { return !cur.find(function(c) { return c.id === x.id; }); }).length;
-      document.getElementById('imp-msg').textContent = 'הקובץ מכיל ' + parsed.length + ' עגלות. שלך: ' + cur.length + '. חדשות: ' + newCount + '.';
-      document.getElementById('imp-overlay').classList.add('open');
-    } catch(err) {
-      showToast('❌ קובץ לא תקין');
-    }
-    e.target.value = '';
-  };
-  reader.readAsText(file);
-}
-function closeImpModal() { document.getElementById('imp-overlay').classList.remove('open'); pendingImport = null; }
-function doImportReplace() {
-  if (!pendingImport) return;
-  save(pendingImport); closeImpModal(); render();
-  showToast('✅ הרשימה הוחלפה בהצלחה!');
-}
-function doImportMerge() {
-  if (!pendingImport) return;
-  var cur = load();
-  var added = pendingImport.filter(function(x) { return !cur.find(function(c) { return c.id === x.id; }); });
-  save(cur.concat(added)); closeImpModal(); render();
-  showToast('✅ נוספו ' + added.length + ' עגלות חדשות!');
-}
 
 // TOAST
 function showToast(msg) {
@@ -494,7 +433,6 @@ function showToast(msg) {
 // CLOSE ON BG CLICK
 document.getElementById('add-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeAddModal(); });
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
-document.getElementById('imp-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeImpModal(); });
 
 // ── Firebase init ──────────────────────────────────────────────
 firebase.initializeApp({
@@ -530,8 +468,8 @@ dbRef.on('value', function(snapshot) {
   var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
   // Migration: ensure Shulke has correct imgStyle
   var shulke = d.find(function(x) { return x.id === 1; });
-  if (shulke && shulke.imgStyle !== 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;') {
-    shulke.imgStyle = 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;';
+  if (shulke && shulke.imgStyle !== 'object-position:center 95%;transform:scale(2);transform-origin:center 95%;') {
+    shulke.imgStyle = 'object-position:center 95%;transform:scale(2);transform-origin:center 95%;';
     delete shulke.imgPos;
     dbRef.set(d);
     return;
