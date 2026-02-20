@@ -93,6 +93,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .btn-merge{background:rgba(46,204,113,0.8);color:#000;border:none;padding:10px 22px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;}
 .btn-cc{background:transparent;color:var(--muted);border:1px solid rgba(245,234,216,0.15);padding:10px 18px;border-radius:10px;font-family:'Heebo',sans-serif;font-size:0.9rem;cursor:pointer;}
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,14,0,0.95);border:1px solid var(--caramel);color:var(--cream);padding:10px 22px;border-radius:30px;font-size:0.88rem;z-index:500;white-space:nowrap;}
+.card-img[src="IMG_2464.jpeg"]{object-position:center 85%;transform:scale(2);transform-origin:center 85%;}
 </style>
 </head>
 <body>
@@ -169,10 +170,14 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 
 <div id="toast"></div>
 
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
 <script>
 var KEY = 'cafe_carts_v9';
 var INITIAL = [
-  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
+  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:center 85%;transform:scale(2);transform-origin:center 85%;", notes:"", rating:0, visited:false, unknown:false},
   {id:2, name:"Cafe Tiran", sub:"קפה טירן", location:"רח׳ קדושי השואה 56\nהרצליה פיתוח", ig:"https://www.instagram.com/cafe_tiran/", waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes", img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:3, name:"דשא גדול", sub:"Deshe Gadol", location:"מושב חרות\nעמק חפר", ig:"https://www.instagram.com/deshe_gadol/", waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes", img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:4, name:"אוטוטו", sub:"Ottoto — גינת גרונימן", location:"גינת גרונימן\nרמת אביב, תל אביב", ig:"https://www.instagram.com/reel/DUcp9R1Apf8/", waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes", img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
@@ -190,12 +195,14 @@ var showOnlyVisited = false;
 var pendingDelId = null;
 var pendingImport = null;
 var toastTimer = null;
+var localData = null;
+var dbRef = null;
 
-function load() {
-  try { var s = localStorage.getItem(KEY); return s ? JSON.parse(s) : INITIAL; } catch(e) { return INITIAL; }
-}
+function load() { return localData || INITIAL; }
+
 function save(d) {
-  try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e) {}
+  localData = d;
+  if (dbRef) dbRef.set(d).catch(function() { showToast('❌ שגיאת שמירה'); });
 }
 
 function igLabel(url) {
@@ -275,8 +282,9 @@ function renderGrid(data) {
     el.style.animationDelay = (i * 0.05) + 's';
     var locLines = (c.location||'').split('\n').join('<br>');
     var label = igLabel(c.ig);
+    var imgStyle = c.imgStyle || (c.imgPos ? 'object-position:' + c.imgPos + ';' : '');
     var imgHtml = c.img
-      ? '<img class="card-img" src="' + c.img + '" alt="" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
+      ? '<img class="card-img" src="' + c.img + '" alt="" style="' + imgStyle + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         + '<div class="card-img-placeholder" style="display:none"><span class="big-emoji">☕</span></div>'
       : '<div class="card-img-placeholder"><span class="big-emoji">☕</span></div>';
     var bodyHtml = c.unknown
@@ -488,7 +496,49 @@ document.getElementById('add-overlay').addEventListener('click', function(e) { i
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
 document.getElementById('imp-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeImpModal(); });
 
-render();
+// ── Firebase init ──────────────────────────────────────────────
+firebase.initializeApp({
+  apiKey:            "AIzaSyA5psJbM4VDL5Dq3Dd3k1qoojepxtlg7OU",
+  authDomain:        "coffe-a2619.firebaseapp.com",
+  databaseURL:       "https://coffe-a2619-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId:         "coffe-a2619",
+  storageBucket:     "coffe-a2619.firebasestorage.app",
+  messagingSenderId: "739227192763",
+  appId:             "1:739227192763:web:2a08f92b1fbb79fc27089e"
+});
+
+dbRef = firebase.database().ref('carts');
+
+// ── Debug indicator ──
+var dbg = document.createElement('div');
+dbg.id = 'fb-debug';
+dbg.style = 'position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;z-index:9999;direction:ltr;';
+dbg.textContent = '⏳ Firebase: connecting...';
+document.body.appendChild(dbg);
+
+firebase.database().ref('.info/connected').on('value', function(snap) {
+  dbg.textContent = snap.val() ? '✅ Firebase: connected' : '❌ Firebase: disconnected';
+});
+
+dbRef.on('value', function(snapshot) {
+  var raw = snapshot.val();
+  if (!raw) {
+    dbg.textContent += ' | writing initial...';
+    dbRef.set(INITIAL).then(function(){ dbg.textContent += ' ✓'; }).catch(function(e){ dbg.textContent += ' ERR: ' + e.message; });
+    return;
+  }
+  var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
+  // Migration: ensure Shulke has correct imgStyle
+  var shulke = d.find(function(x) { return x.id === 1; });
+  if (shulke && shulke.imgStyle !== 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;') {
+    shulke.imgStyle = 'object-position:center 85%;transform:scale(2);transform-origin:center 85%;';
+    delete shulke.imgPos;
+    dbRef.set(d);
+    return;
+  }
+  localData = d;
+  render();
+});
 </script>
 </body>
 </html>
