@@ -93,7 +93,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .btn-merge{background:rgba(46,204,113,0.8);color:#000;border:none;padding:10px 22px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;}
 .btn-cc{background:transparent;color:var(--muted);border:1px solid rgba(245,234,216,0.15);padding:10px 18px;border-radius:10px;font-family:'Heebo',sans-serif;font-size:0.9rem;cursor:pointer;}
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,14,0,0.95);border:1px solid var(--caramel);color:var(--cream);padding:10px 22px;border-radius:30px;font-size:0.88rem;z-index:500;white-space:nowrap;}
-.card-img[src="IMG_2464.jpeg"]{object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;}
+.card-img[src="IMG_2464.jpeg"]{object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;}
 .img-gallery{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;}
 .img-thumb{width:50px;height:50px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:0.7;transition:all 0.2s;flex-shrink:0;}
 .img-thumb.is-main{border-color:var(--golden);opacity:1;}
@@ -101,7 +101,12 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .img-upload-lbl{width:50px;height:50px;border-radius:8px;border:1px dashed rgba(196,122,43,0.4);background:rgba(255,255,255,0.03);color:var(--muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
 .img-upload-lbl:hover{background:rgba(196,122,43,0.1);}
 .hours-label{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;margin-top:10px;}
-.hours-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;resize:none;height:56px;outline:none;direction:rtl;line-height:1.5;}
+.hours-display{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:8px 11px;font-size:0.82rem;color:var(--cream);direction:rtl;line-height:1.7;cursor:pointer;position:relative;}
+.hours-display:hover{border-color:rgba(196,122,43,0.4);}
+.hours-display .edit-hint{position:absolute;top:6px;left:10px;font-size:0.68rem;color:var(--muted);opacity:0;}
+.hours-display:hover .edit-hint{opacity:1;}
+.hours-placeholder{color:rgba(245,234,216,0.25);font-size:0.82rem;}
+.hours-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--caramel);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;resize:none;height:72px;outline:none;direction:rtl;line-height:1.5;}
 .hours-area::placeholder{color:rgba(245,234,216,0.2);}
 </style>
 </head>
@@ -173,7 +178,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 <script>
 var KEY = 'cafe_carts_v9';
 var INITIAL = [
-  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;", notes:"", rating:0, visited:false, unknown:false},
+  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes", img:"IMG_2464.jpeg", imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", notes:"", rating:0, visited:false, unknown:false},
   {id:2, name:"Cafe Tiran", sub:"קפה טירן", location:"רח׳ קדושי השואה 56\nהרצליה פיתוח", ig:"https://www.instagram.com/cafe_tiran/", waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes", img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:3, name:"דשא גדול", sub:"Deshe Gadol", location:"מושב חרות\nעמק חפר", ig:"https://www.instagram.com/deshe_gadol/", waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes", img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
   {id:4, name:"אוטוטו", sub:"Ottoto — גינת גרונימן", location:"גינת גרונימן\nרמת אביב, תל אביב", ig:"https://www.instagram.com/reel/DUcp9R1Apf8/", waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes", img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
@@ -313,7 +318,11 @@ function renderGrid(data) {
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
         + '<div class="hours-label">שעות פתיחה</div>'
-        + '<textarea class="hours-area" placeholder="א-ה: 07:00-17:00&#10;שישי: 07:00-13:00" onchange="upHours(' + c.id + ',this.value)">' + (c.hours||'') + '</textarea>'
+        + '<div class="hours-display" id="hdisp-' + c.id + '" onclick="editHours(' + c.id + ')">'
+          + (c.hours ? (c.hours||'').replace(/\n/g,'<br>') : '<span class="hours-placeholder">לחץ להוספת שעות...</span>')
+          + '<span class="edit-hint">✏️ ערוך</span>'
+        + '</div>'
+        + '<textarea class="hours-area" id="hedit-' + c.id + '" style="display:none" placeholder="א-ה: 07:00-17:00&#10;שישי: 07:00-13:00" onblur="saveHours(' + c.id + ',this.value)">' + (c.hours||'') + '</textarea>'
         + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
         + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
         + '<div class="card-footer">'
@@ -406,7 +415,24 @@ function upLoc(id, v) {
   if (c) { c.location = v; save(d); }
 }
 
-function upHours(id, v) {
+function editHours(id) {
+  var disp = document.getElementById('hdisp-' + id);
+  var edit = document.getElementById('hedit-' + id);
+  if (!disp || !edit) return;
+  disp.style.display = 'none';
+  edit.style.display = 'block';
+  edit.focus();
+}
+
+function saveHours(id, v) {
+  var disp = document.getElementById('hdisp-' + id);
+  var edit = document.getElementById('hedit-' + id);
+  if (disp) {
+    disp.style.display = 'block';
+    disp.innerHTML = v ? v.replace(/\n/g,'<br>') + '<span class="edit-hint">✏️ ערוך</span>'
+                       : '<span class="hours-placeholder">לחץ להוספת שעות...</span><span class="edit-hint">✏️ ערוך</span>';
+  }
+  if (edit) edit.style.display = 'none';
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
   if (c) { c.hours = v; save(d); }
@@ -514,8 +540,8 @@ dbRef.on('value', function(snapshot) {
   var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
   // Migration: ensure Shulke has correct imgStyle
   var shulke = d.find(function(x) { return x.id === 1; });
-  if (shulke && shulke.imgStyle !== 'object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;') {
-    shulke.imgStyle = 'object-position:30% 92%;transform:scale(2);transform-origin:30% 92%;';
+  if (shulke && shulke.imgStyle !== 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;') {
+    shulke.imgStyle = 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;';
     delete shulke.imgPos;
     dbRef.set(d);
     return;
