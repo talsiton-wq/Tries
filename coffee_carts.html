@@ -100,14 +100,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .img-thumb:hover{opacity:1;}
 .img-upload-lbl{width:50px;height:50px;border-radius:8px;border:1px dashed rgba(196,122,43,0.4);background:rgba(255,255,255,0.03);color:var(--muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
 .img-upload-lbl:hover{background:rgba(196,122,43,0.1);}
-.hours-label{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;margin-top:10px;}
-.hours-display{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:9px;padding:8px 11px;font-size:0.82rem;color:var(--cream);direction:rtl;line-height:1.7;cursor:pointer;position:relative;}
-.hours-display:hover{border-color:rgba(196,122,43,0.4);}
-.hours-display .edit-hint{position:absolute;top:6px;left:10px;font-size:0.68rem;color:var(--muted);opacity:0;}
-.hours-display:hover .edit-hint{opacity:1;}
-.hours-placeholder{color:rgba(245,234,216,0.25);font-size:0.82rem;}
-.hours-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--caramel);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;resize:none;height:72px;outline:none;direction:rtl;line-height:1.5;}
-.hours-area::placeholder{color:rgba(245,234,216,0.2);}
+.cart-hours{font-size:0.8rem;color:var(--muted);margin-bottom:10px;display:flex;align-items:flex-start;gap:4px;line-height:1.6;white-space:pre-line;}
 </style>
 </head>
 <body>
@@ -317,12 +310,7 @@ function renderGrid(data) {
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
-        + '<div class="hours-label">שעות פתיחה</div>'
-        + '<div class="hours-display" id="hdisp-' + c.id + '" onclick="editHours(' + c.id + ')">'
-          + (c.hours ? (c.hours||'').replace(/\n/g,'<br>') : '<span class="hours-placeholder">לחץ להוספת שעות...</span>')
-          + '<span class="edit-hint">✏️ ערוך</span>'
-        + '</div>'
-        + '<textarea class="hours-area" id="hedit-' + c.id + '" style="display:none" placeholder="א-ה: 07:00-17:00&#10;שישי: 07:00-13:00" onblur="saveHours(' + c.id + ',this.value)">' + (c.hours||'') + '</textarea>'
+        + (c.hours ? '<div class="cart-hours">🕐 <span>' + (c.hours||'').replace(/\n/g,'<br>') + '</span></div>' : '')
         + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
         + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
         + '<div class="card-footer">'
@@ -413,29 +401,6 @@ function upLoc(id, v) {
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
   if (c) { c.location = v; save(d); }
-}
-
-function editHours(id) {
-  var disp = document.getElementById('hdisp-' + id);
-  var edit = document.getElementById('hedit-' + id);
-  if (!disp || !edit) return;
-  disp.style.display = 'none';
-  edit.style.display = 'block';
-  edit.focus();
-}
-
-function saveHours(id, v) {
-  var disp = document.getElementById('hdisp-' + id);
-  var edit = document.getElementById('hedit-' + id);
-  if (disp) {
-    disp.style.display = 'block';
-    disp.innerHTML = v ? v.replace(/\n/g,'<br>') + '<span class="edit-hint">✏️ ערוך</span>'
-                       : '<span class="hours-placeholder">לחץ להוספת שעות...</span><span class="edit-hint">✏️ ערוך</span>';
-  }
-  if (edit) edit.style.display = 'none';
-  var d = load();
-  var c = d.find(function(x) { return x.id === id; });
-  if (c) { c.hours = v; save(d); }
 }
 
 function setMainImg(id, url) {
