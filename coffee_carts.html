@@ -26,8 +26,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card{background:var(--dark-roast);border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;transition:transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.4s ease both;}
 .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
 .card.is-visited{border-color:rgba(46,204,113,0.3);}
-.visited-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:12px;font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.25s;background:rgba(0,0,0,0.42);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.13);user-select:none;}
-.visited-badge.visited{background:var(--visited-bg);border-color:rgba(46,204,113,0.5);color:var(--visited);}
+.visited-badge{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:12px;font-size:0.69rem;font-weight:700;cursor:pointer;transition:all 0.25s;background:rgba(0,0,0,0.68);color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.3);user-select:none;box-shadow:0 2px 8px rgba(0,0,0,0.55);}
+.visited-badge.visited{background:rgba(39,174,96,0.95);border-color:rgba(255,255,255,0.4);color:#fff;box-shadow:0 2px 10px rgba(39,174,96,0.5);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .card-img-wrap{position:relative;height:200px;overflow:hidden;background:var(--roast);}
 .card-img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;display:block;}
@@ -35,8 +35,9 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card-img-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--roast),var(--medium));}
 .card-img-placeholder .big-emoji{font-size:3rem;}
 .unknown-badge{position:absolute;top:12px;left:12px;background:rgba(196,122,43,0.88);color:var(--espresso);font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:10px;}
-.delete-btn{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:rgba(231,76,60,0.6);cursor:pointer;font-size:0.74rem;font-weight:700;padding:6px 12px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;}
-.delete-btn:hover{background:rgba(231,76,60,0.25);color:var(--danger);}
+.delete-btn{background:none;border:none;color:rgba(231,76,60,0.4);cursor:pointer;font-size:1rem;padding:2px 4px;line-height:1;display:inline-flex;align-items:center;transition:color 0.2s;flex-shrink:0;}
+.delete-btn:hover{color:var(--danger);}
+.name-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px;}
 .card-body{padding:16px;}
 .cart-name{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--golden);margin-bottom:3px;}
 .cart-sub{font-size:0.72rem;color:var(--muted);font-style:italic;margin-bottom:7px;}
@@ -242,7 +243,7 @@ function isOpen(hours) {
     var dayPart = seg.substring(0, col).replace(/׳/g,'').replace(/\s/g,'');
     var timePart = seg.substring(col + 1).trim();
     var days = [];
-    var dash = dayPart.indexOf('–');
+    var dash = dayPart.search(/[–\-]/);
     if (dash >= 0) {
       var s = dayMap[dayPart[0]], e = dayMap[dayPart[dayPart.length-1]];
       if (s !== undefined && e !== undefined) for (var d = s; d <= e; d++) days.push(d);
@@ -257,7 +258,7 @@ function isOpen(hours) {
     var close = parseInt(m[3])*60+parseInt(m[4]);
     return curMin >= open && curMin < close;
   }
-  return null;
+  return false;
 }
 
 function save(d) {
@@ -405,10 +406,11 @@ function renderGrid(data) {
       ? '<img class="card-img" src="' + c.img + '" alt="" style="' + imgStyle + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         + '<div class="card-img-placeholder" style="display:none"><span class="big-emoji">☕</span></div>'
       : '<div class="card-img-placeholder"><span class="big-emoji">☕</span></div>';
+    var delBtn = '<button class="delete-btn" onclick="askDelete(' + c.id + ')" title="מחק">🗑</button>';
     var bodyHtml = c.unknown
-      ? '<input class="inline-input" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">'
+      ? '<div class="name-row"><input class="inline-input" style="flex:1;margin:0" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">' + delBtn + '</div>'
         + '<input class="inline-input" value="' + (c.location||'') + '" placeholder="מיקום..." onchange="upLoc(' + c.id + ',this.value)">'
-      : '<div class="cart-name">' + (c.name||'') + '</div>'
+      : '<div class="name-row"><div class="cart-name" style="flex:1">' + (c.name||'') + '</div>' + delBtn + '</div>'
         + (c.sub ? '<div class="cart-sub">' + c.sub + '</div>' : '')
         + '<div class="cart-location">📍 <span>' + locLines + '</span></div>';
     var openStatus = isOpen(c.hours);
@@ -438,9 +440,6 @@ function renderGrid(data) {
       + '<div class="card-body">'
         + bodyHtml
         + openHtml
-        + '<div class="card-actions">'
-          + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
-        + '</div>'
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
@@ -510,7 +509,6 @@ function toggleVisited(id, btn) {
   save(d);
   btn.classList.toggle('visited', c.visited);
   btn.textContent = c.visited ? '✓ ביקרתי' : '☐ ביקרתי?';
-  btn.title = c.visited ? 'לחץ לביטול' : 'סמן כביקרתי';
   var card = btn.closest('.card');
   if (card) card.classList.toggle('is-visited', c.visited);
   renderMapList(d);
