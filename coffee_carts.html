@@ -604,8 +604,9 @@ function toggleDistSort() {
 function toggleVisited(id) {
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
-  if (!c) return;
+  if (!c) { showToast('⚠️ לא נמצאה עגלה id=' + id); return; }
   c.visited = !c.visited;
+  showToast((c.visited ? '✅ סומן: ' : '⬜ בוטל: ') + (c.name || id));
   save(d);
   deferRender();
 }
