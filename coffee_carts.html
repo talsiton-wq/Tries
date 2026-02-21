@@ -23,7 +23,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .filter-btn.active{border-color:var(--visited);color:var(--visited);background:var(--visited-bg);}
 .count-badge{background:var(--border);color:var(--caramel);padding:6px 12px;border-radius:20px;font-size:0.8rem;font-weight:600;white-space:nowrap;}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px;padding:24px 20px 110px;max-width:1200px;margin:0 auto;}
-.card{background:var(--dark-roast);border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;transition:transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.4s ease both;}
+.card{background:var(--dark-roast);border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;transition:transform 0.25s,box-shadow 0.25s;}
+.card.anim{animation:fadeUp 0.4s ease both;}
 .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
 .card.is-visited{border-color:rgba(46,204,113,0.3);}
 .visited-badge{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:12px;font-size:0.69rem;font-weight:700;cursor:pointer;transition:all 0.25s;background:rgba(0,0,0,0.68);color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.3);user-select:none;box-shadow:0 2px 8px rgba(0,0,0,0.55);}
@@ -249,6 +250,7 @@ var toastTimer = null;
 var localData = null;
 var dbRef = null;
 var _renderTimer = null;
+var _firstRender = true;
 function deferRender() { clearTimeout(_renderTimer); _renderTimer = setTimeout(render, 0); }
 
 function load() { return localData || INITIAL; }
@@ -390,6 +392,11 @@ function submitComment(id) {
   var now = new Date();
   c.comments.push({ name: name || 'אנונימי', text: text, date: now.getDate() + '/' + (now.getMonth()+1) + '/' + (now.getFullYear()%100) });
   save(d);
+  // Close and clear the form BEFORE render so it isn't restored as "open with old text"
+  var form = document.getElementById('cf-' + id);
+  if (form) form.classList.remove('open');
+  if (nameEl) nameEl.value = '';
+  if (textEl) textEl.value = '';
   deferRender();
 }
 
@@ -467,8 +474,8 @@ function renderGrid(data) {
   if (!show.length) { grid.innerHTML = '<div style="text-align:center;padding:80px 20px;color:var(--muted);grid-column:1/-1">לא נמצאו עגלות ☕</div>'; return; }
   show.forEach(function(c, i) {
     var el = document.createElement('div');
-    el.className = 'card' + (c.visited ? ' is-visited' : '');
-    el.style.animationDelay = (i * 0.05) + 's';
+    el.className = 'card' + (c.visited ? ' is-visited' : '') + (_firstRender ? ' anim' : '');
+    if (_firstRender) el.style.animationDelay = (i * 0.05) + 's';
     var locLines = (c.location||'').split('\n').join('<br>');
     var label = igLabel(c.ig);
     var imgStyle = c.imgStyle || (c.imgPos ? 'object-position:' + c.imgPos + ';' : '');
@@ -542,6 +549,7 @@ function renderGrid(data) {
     if (nameEl) nameEl.value = s.name;
     if (textEl) textEl.value = s.text;
   });
+  _firstRender = false;
 }
 
 function renderMapList(data) {
