@@ -736,6 +736,9 @@ document.getElementById('add-overlay').addEventListener('click', function(e) { i
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
 document.getElementById('hours-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeHoursModal(); });
 
+// Render immediately with INITIAL data while Firebase loads
+render();
+
 // ── Firebase init ──────────────────────────────────────────────
 firebase.initializeApp({
   apiKey:            "AIzaSyA5psJbM4VDL5Dq3Dd3k1qoojepxtlg7OU",
