@@ -450,6 +450,16 @@ function filtered(data) {
 }
 
 function renderGrid(data) {
+  // Save open comment forms + typed text before rebuilding
+  var openForms = {};
+  document.querySelectorAll('.comment-form.open').forEach(function(el) {
+    var id = el.id.replace('cf-', '');
+    openForms[id] = {
+      name: (document.getElementById('cn-' + id) || {}).value || '',
+      text: (document.getElementById('ct-' + id) || {}).value || ''
+    };
+  });
+
   var show = filtered(data);
   document.getElementById('count').textContent = show.length + ' עגלות';
   var grid = document.getElementById('grid');
@@ -519,6 +529,18 @@ function renderGrid(data) {
         + '</div>'
       + '</div>';
     grid.appendChild(el);
+  });
+
+  // Restore open comment forms and typed text
+  Object.keys(openForms).forEach(function(id) {
+    var form = document.getElementById('cf-' + id);
+    if (!form) return;
+    form.classList.add('open');
+    var s = openForms[id];
+    var nameEl = document.getElementById('cn-' + id);
+    var textEl = document.getElementById('ct-' + id);
+    if (nameEl) nameEl.value = s.name;
+    if (textEl) textEl.value = s.text;
   });
 }
 
@@ -753,40 +775,13 @@ dbRef = firebase.database().ref('carts');
 
 dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
-  var fbArr = raw ? (Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean)) : [];
-  var fbMap = {};
-  fbArr.forEach(function(c) { if (c) fbMap[c.id] = c; });
-
-  // STATIC: developer controls via INITIAL (user cannot edit in UI)
-  var STATIC = ['name','sub','ig','waze','img','imgStyle','unknown'];
-  var needsSave = !raw;
-  var merged = INITIAL.map(function(ic) {
-    var fb = fbMap[ic.id] || {};
-    var cart = { id: ic.id };
-    STATIC.forEach(function(f) {
-      cart[f] = ic.hasOwnProperty(f) ? ic[f] : fb[f];
-      if (ic.hasOwnProperty(f) && cart[f] !== fb[f]) needsSave = true;
-    });
-    // User-editable: Firebase wins, fall back to INITIAL on first load
-    cart.location = fb.location !== undefined ? fb.location : (ic.location || '');
-    cart.hours    = fb.hours    !== undefined ? fb.hours    : (ic.hours    || '');
-    if (fb.location === undefined && ic.location) needsSave = true;
-    if (fb.hours    === undefined && ic.hours)    needsSave = true;
-    // User interaction data
-    cart.rating  = fb.rating   !== undefined ? fb.rating   : 0;
-    cart.visited = fb.visited  !== undefined ? fb.visited  : false;
-    cart.notes   = fb.notes    !== undefined ? fb.notes    : '';
-    if (fb.comments)    cart.comments    = fb.comments;
-    if (fb.extraImages) cart.extraImages = fb.extraImages;
-    return cart;
-  });
-  // Preserve user-added carts (not in INITIAL)
-  var initialIdSet = {};
-  INITIAL.forEach(function(ic) { initialIdSet[ic.id] = true; });
-  fbArr.forEach(function(fc) { if (fc && !initialIdSet[fc.id]) merged.push(fc); });
-  if (needsSave) dbRef.set(merged).catch(function() { showToast('❌ שגיאת שמירה'); });
-
-  localData = merged;
+  if (raw) {
+    localData = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
+  } else {
+    // First time — seed Firebase from INITIAL
+    localData = INITIAL.map(function(ic) { return Object.assign({}, ic); });
+    dbRef.set(localData).catch(function() { showToast('❌ שגיאת שמירה'); });
+  }
   deferRender();
 });
 </script>
