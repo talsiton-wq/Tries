@@ -26,7 +26,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card{background:var(--dark-roast);border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;transition:transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.4s ease both;}
 .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
 .card.is-visited{border-color:rgba(46,204,113,0.3);}
-.card.is-visited .card-img-wrap::after{content:'✓ ביקרתי';position:absolute;top:12px;right:12px;background:var(--visited);color:#000;font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:10px;}
+.visited-badge{position:absolute;top:10px;right:10px;padding:4px 10px;border-radius:12px;font-size:0.68rem;font-weight:700;cursor:pointer;transition:all 0.25s;background:rgba(0,0,0,0.42);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.13);user-select:none;}
+.visited-badge.visited{background:var(--visited-bg);border-color:rgba(46,204,113,0.5);color:var(--visited);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .card-img-wrap{position:relative;height:200px;overflow:hidden;background:var(--roast);}
 .card-img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;display:block;}
@@ -52,8 +53,6 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .ig-btn{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:white;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;}
 .waze-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(0,200,100,0.1);border:1px solid rgba(0,200,100,0.25);color:#00e676;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
 .maps-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25);color:#4a90d9;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
-.visited-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:0.74rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
-.visited-btn.visited{background:var(--visited-bg);border-color:rgba(46,204,113,0.4);color:var(--visited);}
 .wa-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25d366;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
 .comments-section{margin-top:10px;border-top:1px solid var(--border);padding-top:8px;}
 .comments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
@@ -434,12 +433,12 @@ function renderGrid(data) {
       '<div class="card-img-wrap">'
         + imgHtml
         + (c.unknown ? '<div class="unknown-badge">לא ידוע</div>' : '')
+        + '<div class="visited-badge' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</div>'
       + '</div>'
       + '<div class="card-body">'
         + bodyHtml
         + openHtml
         + '<div class="card-actions">'
-          + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
         + '</div>'
         + galleryHtml
@@ -511,6 +510,7 @@ function toggleVisited(id, btn) {
   save(d);
   btn.classList.toggle('visited', c.visited);
   btn.textContent = c.visited ? '✓ ביקרתי' : '☐ ביקרתי?';
+  btn.title = c.visited ? 'לחץ לביטול' : 'סמן כביקרתי';
   var card = btn.closest('.card');
   if (card) card.classList.toggle('is-visited', c.visited);
   renderMapList(d);
