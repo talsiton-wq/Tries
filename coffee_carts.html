@@ -47,7 +47,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .notes-label{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
 .notes-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.84rem;resize:vertical;min-height:58px;outline:none;direction:rtl;line-height:1.5;}
 .notes-area::placeholder{color:rgba(245,234,216,0.2);}
-.card-footer{display:flex;align-items:center;gap:7px;margin-top:12px;flex-wrap:wrap;}
+.card-actions{display:flex;align-items:center;gap:7px;margin-top:10px;}
+.card-footer{display:flex;align-items:center;gap:7px;margin-top:20px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:wrap;}
 .ig-btn{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:white;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;}
 .waze-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(0,200,100,0.1);border:1px solid rgba(0,200,100,0.25);color:#00e676;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
 .maps-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25);color:#4a90d9;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
@@ -419,7 +420,7 @@ function renderGrid(data) {
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
     var wazeQ = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
     if (c.waze) footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
-    if (wazeQ) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ + '\')">🗺 Maps</a>';
+    if (wazeQ) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ + '\')">G Maps</a>';
     footerLinks += '<a class="wa-btn" href="#" onclick="shareWA(event,' + c.id + ')">💬 שתף</a>';
     var extras = Array.isArray(c.extraImages) ? c.extraImages : [];
     var galleryHtml = '<div class="img-gallery">'
@@ -437,6 +438,10 @@ function renderGrid(data) {
       + '<div class="card-body">'
         + bodyHtml
         + openHtml
+        + '<div class="card-actions">'
+          + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
+          + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
+        + '</div>'
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
@@ -448,9 +453,7 @@ function renderGrid(data) {
           + '</div>'
         + commentsHtml(c.id, c.comments)
         + '<div class="card-footer">'
-          + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + footerLinks
-          + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
         + '</div>'
       + '</div>';
     grid.appendChild(el);
@@ -468,7 +471,7 @@ function renderMapList(data) {
     var links = '';
     var wazeQ2 = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
     if (c.waze) links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
-    if (wazeQ2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ2 + '\')" style="padding:6px 10px;font-size:0.73rem">🗺 Maps</a>';
+    if (wazeQ2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ2 + '\')" style="padding:6px 10px;font-size:0.73rem">G Maps</a>';
     if (c.ig) links += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')" style="padding:6px 10px;font-size:0.73rem">' + igLabel(c.ig) + '</a>';
     item.innerHTML =
       '<div class="map-dot' + (c.visited ? ' visited' : '') + '"></div>'
