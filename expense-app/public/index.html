@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מחלק הוצאות</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 20px 24px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 4px; }
+    header p { opacity: 0.85; font-size: 0.95rem; }
+
+    #syncBar {
+      background: #4f46e5;
+      color: white;
+      text-align: center;
+      font-size: 0.8rem;
+      padding: 4px;
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    #syncBar.visible { opacity: 1; }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: #4f46e5;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    input[type="text"], input[type="number"], select {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    input:focus, select:focus { border-color: #4f46e5; }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 600;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    button:active { transform: scale(0.97); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .btn-primary { background: #4f46e5; color: white; }
+    .btn-primary:hover:not(:disabled) { opacity: 0.9; }
+    .btn-danger  { background: #ef4444; color: white; padding: 4px 10px; font-size: 0.8rem; border-radius: 6px; }
+
+    .members-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+    }
+    .member-chip {
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .member-chip button {
+      padding: 0 4px;
+      background: none;
+      color: #a0aec0;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+    .member-chip button:hover { color: #ef4444; }
+
+    .checkboxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .checkboxes label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f7f8fc;
+      border: 2px solid #e2e8f0;
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .checkboxes label:has(input:checked) {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+    .checkboxes input[type="checkbox"] { accent-color: #4f46e5; }
+
+    .expense-item {
+      background: #f7f8fc;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+    .expense-info { flex: 1; }
+    .expense-desc { font-weight: 600; font-size: 0.95rem; }
+    .expense-meta { font-size: 0.82rem; color: #718096; margin-top: 2px; }
+    .expense-amount { font-size: 1.1rem; font-weight: 700; color: #4f46e5; white-space: nowrap; }
+
+    .balance-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+    .balance-positive { background: #f0fdf4; }
+    .balance-negative { background: #fff5f5; }
+    .balance-zero     { background: #f7f8fc; color: #a0aec0; }
+    .balance-amount   { font-weight: 700; font-size: 1.05rem; }
+    .pos { color: #16a34a; }
+    .neg { color: #dc2626; }
+
+    .settlement-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #fff7ed;
+      border: 2px solid #fed7aa;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+    .settlement-text   { font-size: 0.95rem; }
+    .settlement-amount { font-weight: 700; color: #ea580c; font-size: 1.05rem; }
+    .arrow { margin: 0 6px; color: #a0aec0; }
+
+    .empty-msg {
+      text-align: center;
+      color: #a0aec0;
+      padding: 20px;
+      font-size: 0.9rem;
+    }
+
+    .select-all-btn {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      background: #e2e8f0;
+      color: #4a5568;
+      margin-right: 8px;
+      border-radius: 6px;
+    }
+    .split-label {
+      font-size: 0.85rem;
+      color: #718096;
+      margin-top: 10px;
+      margin-bottom: 4px;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      transition: transform 0.3s;
+      z-index: 999;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .input-row { flex-direction: column; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💰 מחלק הוצאות</h1>
+  <p>כל אחד משלם, הכל מסתדר</p>
+</header>
+<div id="syncBar">🔄 מסנכרן...</div>
+
+<div class="container">
+
+  <!-- Members -->
+  <div class="card">
+    <h2>👥 חברי הקבוצה</h2>
+    <div class="input-row">
+      <input type="text" id="memberName" placeholder="שם החבר/ה" />
+      <button class="btn-primary" onclick="addMember()">הוסף</button>
+    </div>
+    <div class="members-list" id="membersList">
+      <div class="empty-msg">טרם נוספו חברים</div>
+    </div>
+  </div>
+
+  <!-- Add Expense -->
+  <div class="card">
+    <h2>➕ הוסף תשלום</h2>
+    <div class="input-row">
+      <input type="text" id="expenseDesc" placeholder="תיאור (פיצה, נסיעה...)" />
+      <input type="number" id="expenseAmount" placeholder="סכום (₪)" min="0" step="0.01" />
+    </div>
+    <div class="input-row" style="margin-top:10px;">
+      <select id="payerSelect"><option value="">מי שילם?</option></select>
+    </div>
+    <div class="split-label">
+      חלוקה בין:
+      <button class="select-all-btn" onclick="selectAll()">בחר הכל</button>
+    </div>
+    <div class="checkboxes" id="splitCheckboxes">
+      <div class="empty-msg">הוסף חברים כדי לבחור</div>
+    </div>
+    <div style="margin-top:14px;">
+      <button class="btn-primary" onclick="addExpense()">הוסף תשלום</button>
+    </div>
+  </div>
+
+  <!-- Expenses list -->
+  <div class="card">
+    <h2>📋 היסטוריית תשלומים</h2>
+    <div id="expensesList"><div class="empty-msg">אין תשלומים עדיין</div></div>
+  </div>
+
+  <!-- Balances -->
+  <div class="card">
+    <h2>📊 מצב כרגע</h2>
+    <div id="balancesList"><div class="empty-msg">אין נתונים עדיין</div></div>
+  </div>
+
+  <!-- Settlements -->
+  <div class="card">
+    <h2>🤝 מה צריך לשלם</h2>
+    <div id="settlementsList"><div class="empty-msg">הכל מאוזן! 🎉</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── State ──────────────────────────────────────────────────────────────────
+  let members  = [];
+  let expenses = [];
+
+  // ── Toast ──────────────────────────────────────────────────────────────────
+  function toast(msg, duration = 2500) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), duration);
+  }
+
+  // ── API helpers ────────────────────────────────────────────────────────────
+  async function api(method, url, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(url, opts);
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'שגיאה');
+    return json;
+  }
+
+  // ── Load all data ──────────────────────────────────────────────────────────
+  async function loadAll() {
+    [members, expenses] = await Promise.all([
+      fetch('/api/members').then(r => r.json()),
+      fetch('/api/expenses').then(r => r.json()),
+    ]);
+    renderAll();
+  }
+
+  // ── Real-time sync via SSE ─────────────────────────────────────────────────
+  function connectSSE() {
+    const es = new EventSource('/api/events');
+    es.onmessage = (e) => {
+      if (e.data === 'update') {
+        showSyncBar();
+        loadAll();
+      }
+    };
+    es.onerror = () => {
+      setTimeout(connectSSE, 3000); // reconnect on drop
+    };
+  }
+
+  function showSyncBar() {
+    const bar = document.getElementById('syncBar');
+    bar.classList.add('visible');
+    setTimeout(() => bar.classList.remove('visible'), 800);
+  }
+
+  // ── Members ────────────────────────────────────────────────────────────────
+  async function addMember() {
+    const input = document.getElementById('memberName');
+    const name  = input.value.trim();
+    if (!name) return toast('נא להזין שם');
+    try {
+      await api('POST', '/api/members', { name });
+      input.value = '';
+    } catch (e) { toast(e.message); }
+  }
+
+  async function removeMember(name) {
+    try {
+      await api('DELETE', `/api/members/${encodeURIComponent(name)}`);
+    } catch (e) { toast(e.message); }
+  }
+
+  function renderMembers() {
+    const el = document.getElementById('membersList');
+    if (!members.length) {
+      el.innerHTML = '<div class="empty-msg">טרם נוספו חברים</div>';
+    } else {
+      el.innerHTML = members.map(m => `
+        <div class="member-chip">
+          ${m}
+          <button onclick="removeMember('${m}')" title="הסר">×</button>
+        </div>
+      `).join('');
+    }
+
+    // Payer select
+    const sel = document.getElementById('payerSelect');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">מי שילם?</option>' +
+      members.map(m => `<option value="${m}" ${m===cur?'selected':''}>${m}</option>`).join('');
+
+    // Split checkboxes
+    const cb = document.getElementById('splitCheckboxes');
+    if (!members.length) {
+      cb.innerHTML = '<div class="empty-msg">הוסף חברים כדי לבחור</div>';
+    } else {
+      cb.innerHTML = members.map(m => `
+        <label>
+          <input type="checkbox" value="${m}" checked />
+          ${m}
+        </label>
+      `).join('');
+    }
+  }
+
+  function selectAll() {
+    document.querySelectorAll('#splitCheckboxes input[type=checkbox]')
+      .forEach(cb => cb.checked = true);
+  }
+
+  // ── Expenses ───────────────────────────────────────────────────────────────
+  async function addExpense() {
+    const description = document.getElementById('expenseDesc').value.trim();
+    const amount      = parseFloat(document.getElementById('expenseAmount').value);
+    const payer       = document.getElementById('payerSelect').value;
+    const split_among = [...document.querySelectorAll('#splitCheckboxes input:checked')]
+                          .map(cb => cb.value);
+
+    if (!description)       return toast('נא להזין תיאור');
+    if (!amount || amount<=0) return toast('נא להזין סכום תקין');
+    if (!payer)             return toast('נא לבחור מי שילם');
+    if (!split_among.length) return toast('נא לבחור לפחות אדם אחד');
+
+    try {
+      await api('POST', '/api/expenses', { description, amount, payer, split_among });
+      document.getElementById('expenseDesc').value   = '';
+      document.getElementById('expenseAmount').value = '';
+      document.getElementById('payerSelect').value   = '';
+      selectAll();
+      toast('✅ תשלום נוסף');
+    } catch (e) { toast(e.message); }
+  }
+
+  async function removeExpense(id) {
+    try {
+      await api('DELETE', `/api/expenses/${id}`);
+      toast('🗑 תשלום נמחק');
+    } catch (e) { toast(e.message); }
+  }
+
+  function renderExpenses() {
+    const el = document.getElementById('expensesList');
+    if (!expenses.length) {
+      el.innerHTML = '<div class="empty-msg">אין תשלומים עדיין</div>';
+      return;
+    }
+    el.innerHTML = expenses.map(e => {
+      const date = new Date(e.created_at).toLocaleDateString('he-IL');
+      return `
+        <div class="expense-item">
+          <div class="expense-info">
+            <div class="expense-desc">${e.description}</div>
+            <div class="expense-meta">
+              שילם: <strong>${e.payer}</strong> |
+              חלוקה: ${e.split_among.join(', ')} |
+              ${date}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div class="expense-amount">₪${e.amount.toFixed(2)}</div>
+            <button class="btn-danger" onclick="removeExpense(${e.id})">מחק</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // ── Balances & Settlements ─────────────────────────────────────────────────
+  function computeBalances() {
+    const bal = {};
+    members.forEach(m => bal[m] = 0);
+    expenses.forEach(e => {
+      const share = e.amount / e.split_among.length;
+      bal[e.payer] = (bal[e.payer] || 0) + e.amount;
+      e.split_among.forEach(m => { bal[m] = (bal[m] || 0) - share; });
+    });
+    return bal;
+  }
+
+  function computeSettlements(balances) {
+    const creditors = [], debtors = [];
+    Object.entries(balances).forEach(([name, bal]) => {
+      if (bal >  0.005) creditors.push({ name, amount:  bal });
+      if (bal < -0.005) debtors.push({ name, amount: -bal });
+    });
+    creditors.sort((a,b) => b.amount - a.amount);
+    debtors.sort((a,b)   => b.amount - a.amount);
+
+    const txns = [];
+    let i = 0, j = 0;
+    while (i < creditors.length && j < debtors.length) {
+      const c = creditors[i], d = debtors[j];
+      const settle = Math.min(c.amount, d.amount);
+      txns.push({ from: d.name, to: c.name, amount: settle });
+      c.amount -= settle;
+      d.amount -= settle;
+      if (c.amount < 0.005) i++;
+      if (d.amount < 0.005) j++;
+    }
+    return txns;
+  }
+
+  function renderBalances(balances) {
+    const el = document.getElementById('balancesList');
+    const entries = Object.entries(balances);
+    if (!entries.length) {
+      el.innerHTML = '<div class="empty-msg">אין נתונים עדיין</div>';
+      return;
+    }
+    el.innerHTML = entries.map(([name, bal]) => {
+      const cls    = bal >  0.005 ? 'balance-positive' : bal < -0.005 ? 'balance-negative' : 'balance-zero';
+      const amtCls = bal >  0.005 ? 'pos' : bal < -0.005 ? 'neg' : '';
+      const label  = bal >  0.005 ? 'חייבים לך' : bal < -0.005 ? 'אתה/את חייב/ת' : 'מאוזן ✓';
+      return `
+        <div class="balance-item ${cls}">
+          <span>${name} — ${label}</span>
+          <span class="balance-amount ${amtCls}">₪${Math.abs(bal).toFixed(2)}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function renderSettlements(txns) {
+    const el = document.getElementById('settlementsList');
+    if (!txns.length) {
+      el.innerHTML = '<div class="empty-msg">הכל מאוזן! 🎉</div>';
+      return;
+    }
+    el.innerHTML = txns.map(t => `
+      <div class="settlement-item">
+        <span class="settlement-text">
+          <strong>${t.from}</strong>
+          <span class="arrow">→</span>
+          <strong>${t.to}</strong>
+        </span>
+        <span class="settlement-amount">₪${t.amount.toFixed(2)}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderAll() {
+    renderMembers();
+    renderExpenses();
+    const bal  = computeBalances();
+    renderBalances(bal);
+    renderSettlements(computeSettlements(bal));
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  document.getElementById('memberName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') addMember();
+  });
+
+  loadAll();
+  connectSSE();
+</script>
+
+</body>
+</html>
