@@ -219,21 +219,23 @@ var WAZE_COORDS = {
   12: "https://waze.com/ul?ll=32.2774773,34.862573&navigate=yes",
   13: "https://waze.com/ul?ll=32.1395959,34.9062955&navigate=yes",
   14: "https://waze.com/ul?ll=32.13361,34.91111&navigate=yes",
-  15: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes"
+  15: "https://waze.com/ul?ll=32.1000953,34.9638264&navigate=yes",
+  16: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes"
 };
 var INITIAL = [
-  {id:1,  name:"שולק׳ה",        sub:"Shulke Coffee",                  location:"מרכז לב, חופית\nליד כביש 2",              ig:"https://www.instagram.com/shulke.coffee/",        waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes",                                                                                                              img:"IMG_2464.jpeg",                                                                       imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", hours:"א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור",                                              notes:"", rating:0, visited:false, unknown:false},
-  {id:2,  name:"Cafe Tiran",     sub:"קפה טירן",                       location:"רח׳ קדושי השואה 56\nהרצליה פיתוח",         ig:"https://www.instagram.com/cafe_tiran/",           waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes",                                                                        img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85",               hours:"א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
-  {id:3,  name:"דשא גדול",       sub:"Deshe Gadol",                    location:"מושב חרות\nעמק חפר",                      ig:"https://www.instagram.com/deshe_gadol/",          waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes",                                                                                                                          img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85",            hours:"א׳–ה׳: 08:00–18:00 | ו׳: 08:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
-  {id:4,  name:"אוטוטו",         sub:"Ottoto — גינת גרונימן",          location:"גינת גרונימן\nרמת אביב, תל אביב",         ig:"https://www.instagram.com/reel/DUcp9R1Apf8/",    waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes",                                                       img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85",            hours:"א׳–ה׳: 07:30–19:00 | ו׳: 07:30–15:30 | ש׳: 08:30–19:00",                              notes:"", rating:0, visited:false, unknown:false},
-  {id:5,  name:"האחים",          sub:"Haachim",                        location:"אבן גבירול 26\nתל אביב",                  ig:"https://www.instagram.com/reel/DUaN31bDRSH/",    waze:"waze://?q=%D7%90%D7%91%D7%9F+%D7%92%D7%91%D7%99%D7%A8%D7%95%D7%9C+26+%D7%AA%D7%9C+%D7%90%D7%91%D7%99%D7%91&navigate=yes",                                                                        img:"https://images.unsplash.com/photo-1517244683847-7456b63c5969?w=700&q=85",            hours:"א׳–ו׳: 08:00–23:00 | ש׳: 12:00–23:00",                                                notes:"", rating:0, visited:false, unknown:false},
-  {id:9,  name:"Its Beit Hana",  sub:"עגלת קפה",                       location:"בית חנה",                                 ig:"https://www.instagram.com/reel/DUs0tA5jLAm/",    waze:"waze://?q=%D7%91%D7%99%D7%AA+%D7%97%D7%A0%D7%94&navigate=yes",                                                                                                                                    img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=85",            hours:"א׳–ה׳: 07:00–18:30 | ו׳: 07:00–15:00 | ש׳: 08:00–15:00",                              notes:"", rating:0, visited:false, unknown:false},
-  {id:10, name:"לוטי",           sub:"Loti Bakery",                    location:"התמר 18\nאבן יהודה",                      ig:"https://www.instagram.com/reel/DUvpDyUDf5C/",    waze:"waze://?q=%D7%94%D7%AA%D7%9E%D7%A8+18+%D7%90%D7%91%D7%9F+%D7%99%D7%94%D7%95%D7%93%D7%94&navigate=yes",                                                                                        img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&q=85",            hours:"א׳–ה׳: 07:30–20:00 | ו׳: 07:30–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
-  {id:11, name:"קפה לאגו",       sub:"Caffe Lago — כשר מהדרין",        location:"שכונה חדשה\nראש העין",                    ig:"https://www.instagram.com/caffe.lago/",           waze:"waze://?q=%D7%A7%D7%A4%D7%94+%D7%9C%D7%90%D7%92%D7%95+%D7%A8%D7%90%D7%A9+%D7%94%D7%A2%D7%99%D7%9F&navigate=yes",                                                                             img:"https://images.unsplash.com/photo-1439539698758-ba2680ecadb9?w=700&q=85",            hours:"א׳–ה׳: 08:30–22:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
-  {id:12, name:"קפה בורשטיין",   sub:"Burstein Coffee & Bakery",       location:"האומנות 16\nמתחם פולג, נתניה",            ig:"https://www.instagram.com/bursteinpoleg/",        waze:"waze://?q=%D7%94%D7%90%D7%95%D7%9E%D7%A0%D7%95%D7%AA+16+%D7%A4%D7%95%D7%9C%D7%92+%D7%A0%D7%AA%D7%A0%D7%99%D7%94&navigate=yes",                                                               img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85",            hours:"א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
-  {id:13, name:"גילטי",          sub:"GILTI — עגלת קפה ומאפייה",       location:"מושב עדנים\nליד מגרש הכדורסל",           ig:"https://www.instagram.com/gilti_family_bakery/", waze:"waze://?q=%D7%92%D7%99%D7%9C%D7%98%D7%99+%D7%A2%D7%92%D7%9C%D7%AA+%D7%A7%D7%A4%D7%94+%D7%9E%D7%95%D7%A9%D7%91+%D7%A2%D7%93%D7%A0%D7%99%D7%9D&navigate=yes",                                    img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85",            hours:"א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור",                                  notes:"", rating:0, visited:false, unknown:false},
-  {id:14, name:"אסתריקה",        sub:"Esterika Truck על הירקון",        location:"מתחם המועצה האזורית\nדרום השרון",         ig:"https://www.instagram.com/esterika_cafe/",        waze:"waze://?q=%D7%90%D7%A1%D7%AA%D7%A8%D7%99%D7%A7%D7%94+truck+%D7%99%D7%A8%D7%A7%D7%95%D7%9F&navigate=yes",                                                                                    img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85",            hours:"א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור", notes:"", rating:0, visited:false, unknown:false},
-  {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"אגם הצלילים\nראש העין",                                        ig:"https://www.instagram.com/agama_cafe",            waze:"waze://?q=32.1000953,34.9638264&navigate=yes",                                                                                                                                             img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                      notes:"", rating:0, visited:false, unknown:false}
+  {id:1,  name:"שולק׳ה",        sub:"Shulke Coffee",                  location:"מרכז לב, חופית\nליד כביש 2",              ig:"https://www.instagram.com/shulke.coffee/",        waze:WAZE_COORDS[1],  img:"IMG_2464.jpeg",                                                                       imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", hours:"א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור",                                              notes:"", rating:0, visited:false, unknown:false},
+  {id:2,  name:"Cafe Tiran",     sub:"קפה טירן",                       location:"רח׳ קדושי השואה 56\nהרצליה פיתוח",         ig:"https://www.instagram.com/cafe_tiran/",           waze:WAZE_COORDS[2],  img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85",               hours:"א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:3,  name:"דשא גדול",       sub:"Deshe Gadol",                    location:"מושב חרות\nעמק חפר",                      ig:"https://www.instagram.com/deshe_gadol/",          waze:WAZE_COORDS[3],  img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85",            hours:"א׳–ה׳: 08:00–18:00 | ו׳: 08:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:4,  name:"אוטוטו",         sub:"Ottoto — גינת גרונימן",          location:"גינת גרונימן\nרמת אביב, תל אביב",         ig:"https://www.instagram.com/reel/DUcp9R1Apf8/",    waze:WAZE_COORDS[4],  img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85",            hours:"א׳–ה׳: 07:30–19:00 | ו׳: 07:30–15:30 | ש׳: 08:30–19:00",                              notes:"", rating:0, visited:false, unknown:false},
+  {id:5,  name:"האחים",          sub:"Haachim",                        location:"אבן גבירול 26\nתל אביב",                  ig:"https://www.instagram.com/reel/DUaN31bDRSH/",    waze:WAZE_COORDS[5],  img:"https://images.unsplash.com/photo-1517244683847-7456b63c5969?w=700&q=85",            hours:"א׳–ו׳: 08:00–23:00 | ש׳: 12:00–23:00",                                                notes:"", rating:0, visited:false, unknown:false},
+  {id:9,  name:"Its Beit Hana",  sub:"עגלת קפה",                       location:"בית חנה",                                 ig:"https://www.instagram.com/reel/DUs0tA5jLAm/",    waze:WAZE_COORDS[9],  img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=85",            hours:"א׳–ה׳: 07:00–18:30 | ו׳: 07:00–15:00 | ש׳: 08:00–15:00",                              notes:"", rating:0, visited:false, unknown:false},
+  {id:10, name:"לוטי",           sub:"Loti Bakery",                    location:"התמר 18\nאבן יהודה",                      ig:"https://www.instagram.com/reel/DUvpDyUDf5C/",    waze:WAZE_COORDS[10], img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&q=85",            hours:"א׳–ה׳: 07:30–20:00 | ו׳: 07:30–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:11, name:"קפה לאגו",       sub:"Caffe Lago — כשר מהדרין",        location:"שכונה חדשה\nראש העין",                    ig:"https://www.instagram.com/caffe.lago/",           waze:WAZE_COORDS[11], img:"https://images.unsplash.com/photo-1439539698758-ba2680ecadb9?w=700&q=85",            hours:"א׳–ה׳: 08:30–22:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:12, name:"קפה בורשטיין",   sub:"Burstein Coffee & Bakery",       location:"האומנות 16\nמתחם פולג, נתניה",            ig:"https://www.instagram.com/bursteinpoleg/",        waze:WAZE_COORDS[12], img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85",            hours:"א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:13, name:"גילטי",          sub:"GILTI — עגלת קפה ומאפייה",       location:"מושב עדנים\nליד מגרש הכדורסל",           ig:"https://www.instagram.com/gilti_family_bakery/", waze:WAZE_COORDS[13], img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85",            hours:"א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור",                                  notes:"", rating:0, visited:false, unknown:false},
+  {id:14, name:"אסתריקה",        sub:"Esterika Truck על הירקון",        location:"מתחם המועצה האזורית\nדרום השרון",         ig:"https://www.instagram.com/esterika_cafe/",        waze:WAZE_COORDS[14], img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85",            hours:"א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור", notes:"", rating:0, visited:false, unknown:false},
+  {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"אגם הצלילים\nראש העין",                   ig:"https://www.instagram.com/agama_cafe",            waze:WAZE_COORDS[15], img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                      notes:"", rating:0, visited:false, unknown:false},
+  {id:16, name:"Verde",           sub:"ורדה",                           location:"הרצליה",                                  ig:"",                                                waze:WAZE_COORDS[16], img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=700&q=85",            hours:"",                                                                                      notes:"", rating:0, visited:false, unknown:false}
 ];
 
 var filterVal = '';
@@ -293,9 +295,11 @@ function haversine(lat1, lon1, lat2, lon2) {
 
 function parseWazeCoords(wazeUrl) {
   if (!wazeUrl) return null;
+  var m = wazeUrl.match(/ll=([-\d.]+),([-\d.]+)/);
+  if (m) return {lat: parseFloat(m[1]), lng: parseFloat(m[2])};
   var q = wazeUrl.replace('waze://?q=','').replace('&navigate=yes','');
-  var m = q.match(/^(-?\d+\.\d+),(-?\d+\.\d+)$/);
-  return m ? {lat: parseFloat(m[1]), lng: parseFloat(m[2])} : null;
+  var m2 = q.match(/^(-?\d+\.\d+),(-?\d+\.\d+)$/);
+  return m2 ? {lat: parseFloat(m2[1]), lng: parseFloat(m2[2])} : null;
 }
 
 function distKm(c) {
@@ -475,9 +479,11 @@ function renderGrid(data) {
     var distHtml = km !== null ? '<span class="dist-badge">📍 ' + (km < 1 ? Math.round(km * 1000) + ' מ׳' : km.toFixed(1) + ' ק״מ') + '</span>' : '';
     var footerLinks = '';
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
-    var wazeQ = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
-    if (c.waze) footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
-    if (wazeQ) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    if (c.waze) {
+      footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
+      var llMatch = c.waze.match(/ll=([-\d.]+),([-\d.]+)/);
+      if (llMatch) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch[1] + ',' + llMatch[2] + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    }
     footerLinks += '<a class="wa-btn" href="#" onclick="shareWA(event,' + c.id + ')">💬 שתף</a>';
     var extras = Array.isArray(c.extraImages) ? c.extraImages : [];
     var galleryHtml = '<div class="img-gallery">'
@@ -523,9 +529,11 @@ function renderMapList(data) {
     item.className = 'map-item' + (c.visited ? ' is-visited' : '');
     var name = c.name || (c.ig ? igLabel(c.ig) : 'עגלה לא ידועה');
     var links = '';
-    var wazeQ2 = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
-    if (c.waze) links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
-    if (wazeQ2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ2 + '\')" style="padding:6px 10px;font-size:0.73rem"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    if (c.waze) {
+      links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
+      var llMatch2 = c.waze.match(/ll=([-\d.]+),([-\d.]+)/);
+      if (llMatch2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch2[1] + ',' + llMatch2[2] + '\')" style="padding:6px 10px;font-size:0.73rem"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    }
     if (c.ig) links += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')" style="padding:6px 10px;font-size:0.73rem">' + igLabel(c.ig) + '</a>';
     item.innerHTML =
       '<div class="map-dot' + (c.visited ? ' visited' : '') + '"></div>'
@@ -778,6 +786,12 @@ dbRef.on('value', function(snapshot) {
   var hoursUpdated = false;
   d.forEach(function(c) { if (hoursMap[c.id] && !c.hours) { c.hours = hoursMap[c.id]; hoursUpdated = true; } });
   if (hoursUpdated) { dbRef.set(d); return; }
+  // Migration: update old waze:// links to coordinate-based https:// URLs
+  var needsWazeMigration = d.some(function(x) { return x.waze && x.waze.indexOf('waze://') === 0; });
+  if (needsWazeMigration) {
+    d.forEach(function(x) { if (WAZE_COORDS[x.id]) x.waze = WAZE_COORDS[x.id]; });
+    dbRef.set(d); return;
+  }
   // Migration: add new INITIAL carts missing from Firebase
   var existingIds = d.map(function(c) { return c.id; });
   var newCarts = INITIAL.filter(function(ic) { return existingIds.indexOf(ic.id) < 0; });
