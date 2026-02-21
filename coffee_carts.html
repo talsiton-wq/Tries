@@ -683,6 +683,10 @@ dbRef.on('value', function(snapshot) {
   var hoursUpdated = false;
   d.forEach(function(c) { if (hoursMap[c.id] && !c.hours) { c.hours = hoursMap[c.id]; hoursUpdated = true; } });
   if (hoursUpdated) { dbRef.set(d); return; }
+  // Migration: add new INITIAL carts missing from Firebase
+  var existingIds = d.map(function(c) { return c.id; });
+  var newCarts = INITIAL.filter(function(ic) { return existingIds.indexOf(ic.id) < 0; });
+  if (newCarts.length) { newCarts.forEach(function(c) { d.push(c); }); dbRef.set(d); return; }
   localData = d;
   render();
 });
