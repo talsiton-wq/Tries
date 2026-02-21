@@ -446,8 +446,6 @@ function renderGrid(data) {
               : '<span class="hours-empty">שעות לא הוגדרו</span>')
           + '<button class="edit-hours-btn" onclick="askEditHours(' + c.id + ')" title="ערוך שעות">✏️</button>'
           + '</div>'
-        + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
-        + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
         + commentsHtml(c.id, c.comments)
         + '<div class="card-footer">'
           + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
