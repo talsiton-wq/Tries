@@ -961,6 +961,15 @@ dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
   if (raw) {
     localData = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
+    // Patch carts missing an image — assign a deterministic Splash photo
+    var patched = false;
+    localData.forEach(function(c) {
+      if (!c.img) {
+        c.img = SPLASH_IMGS[(c.id || Date.now()) % SPLASH_IMGS.length];
+        patched = true;
+      }
+    });
+    if (patched) dbRef.set(localData).catch(function() {});
   } else {
     // First time — seed Firebase from INITIAL
     localData = INITIAL.map(function(ic) { return Object.assign({}, ic); });
