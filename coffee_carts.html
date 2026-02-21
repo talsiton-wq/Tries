@@ -390,7 +390,7 @@ function submitComment(id) {
   var now = new Date();
   c.comments.push({ name: name || 'אנונימי', text: text, date: now.getDate() + '/' + (now.getMonth()+1) + '/' + (now.getFullYear()%100) });
   save(d);
-  renderGrid(d);
+  deferRender();
 }
 
 function igUsername(url) {
@@ -607,13 +607,13 @@ function toggleVisited(id) {
   if (!c) return;
   c.visited = !c.visited;
   save(d);
-  render();
+  deferRender();
 }
 
 function rate(id, r) {
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
-  if (c) { c.rating = r; save(d); render(); }
+  if (c) { c.rating = r; save(d); deferRender(); }
 }
 
 function upNote(id, v) {
@@ -648,7 +648,7 @@ function doSaveHours() {
   var v = document.getElementById('f-hours-edit').value.trim();
   var d = load();
   var c = d.find(function(x) { return x.id === pendingHoursId; });
-  if (c) { c.hours = v; save(d); render(); }
+  if (c) { c.hours = v; save(d); deferRender(); }
   closeHoursModal();
 }
 
@@ -661,7 +661,7 @@ function setMainImg(id, url) {
   c.extraImages = c.extraImages.filter(function(u) { return u !== url; });
   c.img = url;
   c.imgStyle = '';
-  save(d); render();
+  save(d); deferRender();
 }
 
 function uploadImg(id, input) {
@@ -677,7 +677,7 @@ function uploadImg(id, input) {
     if (!c) return;
     if (!c.extraImages) c.extraImages = [];
     c.extraImages.push(url);
-    save(d); render();
+    save(d); deferRender();
     showToast('✅ תמונה הועלתה!');
   }).catch(function() { showToast('❌ שגיאת העלאה'); });
   input.value = '';
@@ -695,7 +695,7 @@ function closeDelModal() { document.getElementById('del-overlay').classList.remo
 function doDelete() {
   if (!pendingDelId) return;
   var d = load().filter(function(x) { return x.id !== pendingDelId; });
-  save(d); closeDelModal(); render();
+  save(d); closeDelModal(); deferRender();
 }
 
 // ADD
@@ -717,7 +717,7 @@ function addCart() {
     hours: document.getElementById('f-hours').value.trim(),
     notes: '', rating: 0, visited: false, unknown: false
   });
-  save(d); closeAddModal(); render();
+  save(d); closeAddModal(); deferRender();
 }
 
 
