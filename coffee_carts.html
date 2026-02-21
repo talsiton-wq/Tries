@@ -248,6 +248,8 @@ var pendingImport = null;
 var toastTimer = null;
 var localData = null;
 var dbRef = null;
+var _renderTimer = null;
+function deferRender() { clearTimeout(_renderTimer); _renderTimer = setTimeout(render, 0); }
 
 function load() { return localData || INITIAL; }
 
@@ -784,7 +786,7 @@ dbRef.on('value', function(snapshot) {
   if (needsSave) dbRef.set(merged).catch(function() { showToast('❌ שגיאת שמירה'); });
 
   localData = merged;
-  render();
+  deferRender();
 });
 </script>
 </body>
