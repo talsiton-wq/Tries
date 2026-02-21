@@ -216,7 +216,7 @@ var INITIAL = [
   {id:12, name:"קפה בורשטיין",   sub:"Burstein Coffee & Bakery",       location:"האומנות 16\nמתחם פולג, נתניה",            ig:"https://www.instagram.com/bursteinpoleg/",        waze:"waze://?q=%D7%94%D7%90%D7%95%D7%9E%D7%A0%D7%95%D7%AA+16+%D7%A4%D7%95%D7%9C%D7%92+%D7%A0%D7%AA%D7%A0%D7%99%D7%94&navigate=yes",                                                               img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85",            hours:"א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
   {id:13, name:"גילטי",          sub:"GILTI — עגלת קפה ומאפייה",       location:"מושב עדנים\nליד מגרש הכדורסל",           ig:"https://www.instagram.com/gilti_family_bakery/", waze:"waze://?q=%D7%92%D7%99%D7%9C%D7%98%D7%99+%D7%A2%D7%92%D7%9C%D7%AA+%D7%A7%D7%A4%D7%94+%D7%9E%D7%95%D7%A9%D7%91+%D7%A2%D7%93%D7%A0%D7%99%D7%9D&navigate=yes",                                    img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85",            hours:"א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור",                                  notes:"", rating:0, visited:false, unknown:false},
   {id:14, name:"אסתריקה",        sub:"Esterika Truck על הירקון",        location:"מתחם המועצה האזורית\nדרום השרון",         ig:"https://www.instagram.com/esterika_cafe/",        waze:"waze://?q=%D7%90%D7%A1%D7%AA%D7%A8%D7%99%D7%A7%D7%94+truck+%D7%99%D7%A8%D7%A7%D7%95%D7%9F&navigate=yes",                                                                                    img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85",            hours:"א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור", notes:"", rating:0, visited:false, unknown:false},
-  {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"",                                        ig:"",                                                waze:"waze://?q=32.1000953,34.9638264&navigate=yes",                                                                                                                                             img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"",                                                                                     notes:"", rating:0, visited:false, unknown:false}
+  {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"",                                        ig:"https://www.instagram.com/agama_cafe",            waze:"waze://?q=32.1000953,34.9638264&navigate=yes",                                                                                                                                             img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"",                                                                                     notes:"", rating:0, visited:false, unknown:false}
 ];
 
 var filterVal = '';
@@ -687,6 +687,9 @@ dbRef.on('value', function(snapshot) {
   var existingIds = d.map(function(c) { return c.id; });
   var newCarts = INITIAL.filter(function(ic) { return existingIds.indexOf(ic.id) < 0; });
   if (newCarts.length) { newCarts.forEach(function(c) { d.push(c); }); dbRef.set(d); return; }
+  // Migration: patch missing ig on id:15
+  var agama = d.find(function(c) { return c.id === 15; });
+  if (agama && !agama.ig) { agama.ig = 'https://www.instagram.com/agama_cafe'; dbRef.set(d); return; }
   localData = d;
   render();
 });
