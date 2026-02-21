@@ -751,62 +751,31 @@ dbRef = firebase.database().ref('carts');
 
 dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
-  if (!raw) {
-    dbRef.set(INITIAL).catch(function() { showToast('❌ שגיאת שמירה'); });
-    return;
-  }
-  var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
-  // Migration: Shulke imgStyle
-  var shulke = d.find(function(x) { return x.id === 1; });
-  if (shulke && shulke.imgStyle !== 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;') {
-    shulke.imgStyle = 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;';
-    delete shulke.imgPos;
-    dbRef.set(d);
-    return;
-  }
-  // Migration: add hours to existing carts
-  var hoursMap = {
-    1:'א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור',
-    2:'א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור',
-    3:'א׳–ה׳: 08:00–18:00 | ו׳: 08:00–14:00 | ש׳: סגור',
-    4:'א׳–ה׳: 07:30–19:00 | ו׳: 07:30–15:30 | ש׳: 08:30–19:00',
-    5:'א׳–ו׳: 08:00–23:00 | ש׳: 12:00–23:00',
-    9:'א׳–ה׳: 07:00–18:30 | ו׳: 07:00–15:00 | ש׳: 08:00–15:00',
-    10:'א׳–ה׳: 07:30–20:00 | ו׳: 07:30–14:30 | ש׳: סגור',
-    11:'א׳–ה׳: 08:30–22:00 | ו׳: 08:00–14:30 | ש׳: סגור',
-    12:'א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור',
-    13:'א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור',
-    14:'א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור'
-  };
-  var hoursUpdated = false;
-  d.forEach(function(c) { if (hoursMap[c.id] && !c.hours) { c.hours = hoursMap[c.id]; hoursUpdated = true; } });
-  if (hoursUpdated) { dbRef.set(d); return; }
-  // Migration: update old waze:// links to coordinate-based https:// URLs
-  var needsWazeMigration = d.some(function(x) { return x.waze && x.waze.indexOf('waze://') === 0; });
-  if (needsWazeMigration) {
-    d.forEach(function(x) { if (WAZE_COORDS[x.id]) x.waze = WAZE_COORDS[x.id]; });
-    dbRef.set(d); return;
-  }
-  // Migration: add new INITIAL carts missing from Firebase
-  var existingIds = d.map(function(c) { return c.id; });
-  var newCarts = INITIAL.filter(function(ic) { return existingIds.indexOf(ic.id) < 0; });
-  if (newCarts.length) { newCarts.forEach(function(c) { d.push(c); }); dbRef.set(d); return; }
-  // Migration: patch missing ig/hours on id:15
-  var agama = d.find(function(c) { return c.id === 15; });
-  if (agama && (!agama.ig || !agama.hours || !agama.location)) {
-    if (!agama.ig) agama.ig = 'https://www.instagram.com/agama_cafe';
-    if (!agama.hours) agama.hours = 'א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור';
-    if (!agama.location) agama.location = 'אגם הצלילים\nראש העין';
-    dbRef.set(d); return;
-  }
-  // Migration: patch missing ig/hours on id:16 (Verde)
-  var verde = d.find(function(c) { return c.id === 16; });
-  if (verde && (!verde.ig || !verde.hours)) {
-    if (!verde.ig) verde.ig = 'https://www.instagram.com/verde.bake.wine?igsh=MTFveXJrbGEzbjJlag==';
-    if (!verde.hours) verde.hours = 'א׳–ה׳: 06:30–23:00 | ו׳: 06:30–16:00 | ש׳: 07:00–23:00';
-    dbRef.set(d); return;
-  }
-  localData = d;
+  var fbArr = raw ? (Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean)) : [];
+  var fbMap = {};
+  fbArr.forEach(function(c) { if (c) fbMap[c.id] = c; });
+
+  // INITIAL is the source of truth for static fields.
+  // Firebase preserves only user-generated fields: rating, visited, notes.
+  var STATIC = ['name','sub','location','ig','waze','img','imgStyle','hours','unknown'];
+  var needsSave = !raw;
+  var merged = INITIAL.map(function(ic) {
+    var fb = fbMap[ic.id] || {};
+    var cart = { id: ic.id };
+    STATIC.forEach(function(f) {
+      cart[f] = ic.hasOwnProperty(f) ? ic[f] : fb[f];
+      if (cart[f] !== fb[f]) needsSave = true;
+    });
+    cart.rating  = fb.rating  !== undefined ? fb.rating  : 0;
+    cart.visited = fb.visited !== undefined ? fb.visited : false;
+    cart.notes   = fb.notes   !== undefined ? fb.notes   : '';
+    if (fb.extraImages) cart.extraImages = fb.extraImages;
+    return cart;
+  });
+  if (merged.length !== fbArr.length) needsSave = true;
+  if (needsSave) dbRef.set(merged).catch(function() { showToast('❌ שגיאת שמירה'); });
+
+  localData = merged;
   render();
 });
 </script>
