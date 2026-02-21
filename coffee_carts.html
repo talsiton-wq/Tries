@@ -169,6 +169,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
     <input type="text" id="f-waze" placeholder="https://waze.com/ul?q=..." />
     <div class="field-label">שעות פתיחה</div>
     <input type="text" id="f-hours" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" />
+    <div class="field-label">הערות</div>
+    <input type="text" id="f-notes" placeholder="למשל: עמוס בסופ״ש, כניסה מהחנייה..." />
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
       <button class="btn-add" onclick="addCart()">הוסף ☕</button>
@@ -576,7 +578,7 @@ function saveCartEdit(id) {
   var d = load();
   var c = d.find(function(x) { return x.id === id; });
   if (!c) return;
-  var fields = ['name','sub','location','ig','waze'];
+  var fields = ['name','sub','location','ig','waze','notes'];
   fields.forEach(function(f) {
     var el = document.getElementById('edit-' + f + '-' + id);
     if (el) c[f] = el.value.trim();
@@ -712,6 +714,7 @@ function renderGrid(data) {
           + '<input class="inline-input" id="edit-location-' + c.id + '" value="' + esc(c.location||'') + '" placeholder="מיקום...">'
           + '<input class="inline-input" id="edit-ig-' + c.id + '" value="' + esc(c.ig||'') + '" placeholder="קישור אינסטגרם...">'
           + '<input class="inline-input" id="edit-waze-' + c.id + '" value="' + esc(c.waze||'') + '" placeholder="קישור Waze...">'
+          + '<input class="inline-input" id="edit-notes-' + c.id + '" value="' + esc(c.notes||'') + '" placeholder="הערות...">'
         + '</div>'
         + '<div style="display:flex;flex-direction:column;gap:4px">'
           + '<button class="comment-submit" onclick="saveCartEdit(' + c.id + ')">שמור ✓</button>'
@@ -976,7 +979,7 @@ function doDelete() {
 function openAddModal() { document.getElementById('add-overlay').classList.add('open'); }
 function closeAddModal() {
   document.getElementById('add-overlay').classList.remove('open');
-  ['f-name','f-loc','f-ig','f-img','f-waze','f-hours'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-name','f-loc','f-ig','f-img','f-waze','f-hours','f-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
 }
 function addCart() {
   var name = document.getElementById('f-name').value.trim();
@@ -989,7 +992,7 @@ function addCart() {
     img: document.getElementById('f-img').value.trim() || SPLASH_IMGS[Math.floor(Math.random() * SPLASH_IMGS.length)],
     waze: document.getElementById('f-waze').value.trim(),
     hours: document.getElementById('f-hours').value.trim(),
-    notes: '', rating: 0, visited: false, unknown: false
+    notes: document.getElementById('f-notes').value.trim(), rating: 0, visited: false, unknown: false
   });
   save(d); closeAddModal(); deferRender();
 }
