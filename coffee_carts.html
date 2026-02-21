@@ -580,11 +580,15 @@ function toggleDistSort() {
         userLat = pos.coords.latitude;
         userLng = pos.coords.longitude;
         render();
-      }, function() {
-        showToast('❌ לא ניתן לקבל מיקום');
+      }, function(err) {
         sortByDist = false;
         document.getElementById('sort-dist').classList.remove('active');
-      });
+        if (err.code === 1) {
+          showToast('🔒 חסום — אפשר מיקום בהגדרות הדפדפן ורענן');
+        } else {
+          showToast('❌ לא ניתן לקבל מיקום');
+        }
+      }, {timeout:10000});
     } else {
       showToast('❌ דפדפן לא תומך במיקום');
       sortByDist = false;
@@ -742,15 +746,6 @@ firebase.initializeApp({
   messagingSenderId: "739227192763",
   appId:             "1:739227192763:web:2a08f92b1fbb79fc27089e"
 });
-
-// Geolocation – silent init, updates distance badges when ready
-if (navigator.geolocation) {
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    userLat = pos.coords.latitude;
-    userLng = pos.coords.longitude;
-    render();
-  }, function() {});
-}
 
 dbRef = firebase.database().ref('carts');
 
