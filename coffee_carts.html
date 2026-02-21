@@ -799,6 +799,13 @@ dbRef.on('value', function(snapshot) {
     if (!agama.location) agama.location = 'אגם הצלילים\nראש העין';
     dbRef.set(d); return;
   }
+  // Migration: patch missing ig/hours on id:16 (Verde)
+  var verde = d.find(function(c) { return c.id === 16; });
+  if (verde && (!verde.ig || !verde.hours)) {
+    if (!verde.ig) verde.ig = 'https://www.instagram.com/verde.bake.wine?igsh=MTFveXJrbGEzbjJlag==';
+    if (!verde.hours) verde.hours = 'א׳–ה׳: 06:30–23:00 | ו׳: 06:30–16:00 | ש׳: 07:00–23:00';
+    dbRef.set(d); return;
+  }
   localData = d;
   render();
 });
