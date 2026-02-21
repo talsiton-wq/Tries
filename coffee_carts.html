@@ -124,6 +124,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .open-badge.open{background:rgba(46,204,113,0.12);color:#2ecc71;border:1px solid rgba(46,204,113,0.3);}
 .open-badge.closed{background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid rgba(231,76,60,0.2);}
 .dist-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:12px;background:rgba(66,133,244,0.12);color:#4a90d9;border:1px solid rgba(66,133,244,0.25);margin-right:6px;}
+.dist-badge.approx{background:rgba(180,130,50,0.12);color:#b08030;border-color:rgba(180,130,50,0.3);}
 </style>
 </head>
 <body>
@@ -253,6 +254,15 @@ var _renderTimer = null;
 var _firstRender = true;
 var editModeIds = {};
 var editCommentState = null; // {cartId, idx}
+var SPLASH_IMGS = [
+  'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85',
+  'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&q=85',
+  'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85',
+  'https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85',
+  'https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85',
+  'https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=85',
+  'https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85'
+];
 function deferRender() { clearTimeout(_renderTimer); _renderTimer = setTimeout(render, 0); }
 
 function load() { return localData || INITIAL; }
@@ -308,12 +318,69 @@ function parseWazeCoords(wazeUrl) {
   return m2 ? {lat: parseFloat(m2[1]), lng: parseFloat(m2[2])} : null;
 }
 
-function distKm(c) {
+var CITY_COORDS = {
+  'תל אביב':        {lat:32.0853, lng:34.7818},
+  'ת"א':            {lat:32.0853, lng:34.7818},
+  'רמת אביב':       {lat:32.1117, lng:34.8042},
+  'הרצליה':         {lat:32.1663, lng:34.8434},
+  'הרצליה פיתוח':  {lat:32.1500, lng:34.8000},
+  'ראש העין':       {lat:32.0956, lng:34.9551},
+  'נתניה':          {lat:32.3226, lng:34.8533},
+  'אבן יהודה':      {lat:32.2685, lng:34.8899},
+  'חרות':           {lat:32.2614, lng:34.9394},
+  'עדנים':          {lat:32.2311, lng:35.0272},
+  'בית חנה':        {lat:32.4786, lng:35.0267},
+  'חופית':          {lat:32.3947, lng:34.8522},
+  'פולג':           {lat:32.3100, lng:34.8500},
+  'ירושלים':        {lat:31.7683, lng:35.2137},
+  'חיפה':           {lat:32.7940, lng:34.9896},
+  'באר שבע':        {lat:31.2530, lng:34.7915},
+  'פתח תקווה':      {lat:32.0869, lng:34.8878},
+  'ראשון לציון':    {lat:31.9730, lng:34.7898},
+  'רחובות':         {lat:31.8969, lng:34.8186},
+  'כפר סבא':        {lat:32.1784, lng:34.9078},
+  'רעננה':          {lat:32.1840, lng:34.8706},
+  'הוד השרון':      {lat:32.1528, lng:34.8942},
+  'רמת גן':         {lat:32.0698, lng:34.8238},
+  'בני ברק':        {lat:32.0839, lng:34.8337},
+  'גבעתיים':        {lat:32.0701, lng:34.8121},
+  'חולון':          {lat:32.0114, lng:34.7731},
+  'בת ים':          {lat:32.0233, lng:34.7534},
+  'אשדוד':          {lat:31.7983, lng:34.6499},
+  'אשקלון':         {lat:31.6688, lng:34.5742},
+  'רמלה':           {lat:31.9300, lng:34.8716},
+  'לוד':            {lat:31.9516, lng:34.8954},
+  'מודיעין':        {lat:31.8982, lng:35.0100},
+  'טבריה':          {lat:32.7940, lng:35.5305},
+  'נצרת':           {lat:32.7021, lng:35.2978},
+  'עפולה':          {lat:32.6082, lng:35.2886},
+  'צפת':            {lat:32.9642, lng:35.4960},
+  'עכו':            {lat:32.9231, lng:35.0713},
+  'נהריה':          {lat:33.0077, lng:35.0972}
+};
+
+function distKmFull(c) {
   if (userLat === null) return null;
   var wazeUrl = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : c.waze;
   var coords = parseWazeCoords(wazeUrl);
+  var approx = false;
+  if (!coords && c.location) {
+    var loc = c.location;
+    for (var city in CITY_COORDS) {
+      if (loc.indexOf(city) >= 0) {
+        coords = CITY_COORDS[city];
+        approx = true;
+        break;
+      }
+    }
+  }
   if (!coords) return null;
-  return haversine(userLat, userLng, coords.lat, coords.lng);
+  return { km: haversine(userLat, userLng, coords.lat, coords.lng), approx: approx };
+}
+
+function distKm(c) {
+  var r = distKmFull(c);
+  return r ? r.km : null;
 }
 
 function save(d) {
@@ -485,19 +552,19 @@ function igUsername(url) {
 function openIG(e, url) {
   e.preventDefault();
   var isAndroid = /Android/i.test(navigator.userAgent);
-  var isChrome  = /Chrome/i.test(navigator.userAgent) && !/Safari/.test(navigator.userAgent.replace('Chrome',''));
   var username = igUsername(url);
-  // Build path relative to instagram.com for the intent URL
   var m = url.match(/instagram\.com(\/[^?#]*)/);
   var igPath = m ? m[1] : '/';
   if (!igPath.endsWith('/')) igPath += '/';
 
   if (isAndroid) {
-    // Chrome Android: use intent:// to open the Instagram app directly
-    var intentUrl = 'intent://instagram.com' + igPath + '#Intent;scheme=https;package=com.instagram.android;end';
+    // Chrome Android: intent:// opens app directly; S.browser_fallback_url handles "not installed"
+    var fallback = encodeURIComponent('https://www.instagram.com' + igPath);
+    var intentUrl = 'intent://www.instagram.com' + igPath
+      + '#Intent;scheme=https;package=com.instagram.android;S.browser_fallback_url=' + fallback + ';end';
     window.location.href = intentUrl;
   } else if (username) {
-    // iOS Safari: deep-link into app, fallback to web
+    // iOS Safari: deep-link into app, fallback to web after 1.5s
     var appUrl = 'instagram://user?username=' + username;
     var start = Date.now();
     window.location = appUrl;
@@ -595,15 +662,21 @@ function renderGrid(data) {
     var openHtml = openStatus === null ? ''
       : openStatus ? '<span class="open-badge open">🟢 פתוח עכשיו</span>'
                    : '<span class="open-badge closed">🔴 סגור</span>';
-    var km = distKm(c);
-    var distHtml = km !== null ? '<span class="dist-badge">📍 ' + (km < 1 ? Math.round(km * 1000) + ' מ׳' : km.toFixed(1) + ' ק״מ') + '</span>' : '';
+    var distResult = distKmFull(c);
+    var distHtml = distResult !== null
+      ? '<span class="dist-badge' + (distResult.approx ? ' approx' : '') + '">📍 '
+          + (distResult.approx ? '~' : '')
+          + (distResult.km < 1 ? Math.round(distResult.km * 1000) + ' מ׳' : distResult.km.toFixed(1) + ' ק״מ')
+          + (distResult.approx ? ' (ישוב)' : '')
+          + '</span>'
+      : '';
     var effectiveWaze = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : (c.waze || '');
     var footerLinks = '';
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
     if (effectiveWaze) {
       footerLinks += '<a class="waze-btn" href="' + effectiveWaze + '" onclick="openWaze(event,\'' + effectiveWaze + '\')">🚗 Waze</a>';
-      var llMatch = effectiveWaze.match(/ll=([-\d.]+),([-\d.]+)/);
-      if (llMatch) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch[1] + ',' + llMatch[2] + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+      var wCoords = parseWazeCoords(effectiveWaze);
+      if (wCoords) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wCoords.lat + ',' + wCoords.lng + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
     }
     footerLinks += '<a class="wa-btn" href="#" onclick="shareWA(event,' + c.id + ')">💬 שתף</a>';
     var extras = Array.isArray(c.extraImages) ? c.extraImages : [];
@@ -662,11 +735,12 @@ function renderMapList(data) {
     var item = document.createElement('div');
     item.className = 'map-item' + (c.visited ? ' is-visited' : '');
     var name = c.name || (c.ig ? igLabel(c.ig) : 'עגלה לא ידועה');
+    var mapEffWaze = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : (c.waze || '');
     var links = '';
-    if (c.waze) {
-      links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
-      var llMatch2 = c.waze.match(/ll=([-\d.]+),([-\d.]+)/);
-      if (llMatch2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch2[1] + ',' + llMatch2[2] + '\')" style="padding:6px 10px;font-size:0.73rem"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    if (mapEffWaze) {
+      links += '<a class="waze-btn" href="' + mapEffWaze + '" onclick="openWaze(event,\'' + mapEffWaze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
+      var mCoords = parseWazeCoords(mapEffWaze);
+      if (mCoords) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + mCoords.lat + ',' + mCoords.lng + '\')" style="padding:6px 10px;font-size:0.73rem"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
     }
     if (c.ig) links += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')" style="padding:6px 10px;font-size:0.73rem">' + igLabel(c.ig) + '</a>';
     item.innerHTML =
@@ -845,7 +919,7 @@ function addCart() {
     id: Date.now(), name: name, sub: '',
     location: document.getElementById('f-loc').value.trim(),
     ig: document.getElementById('f-ig').value.trim(),
-    img: document.getElementById('f-img').value.trim(),
+    img: document.getElementById('f-img').value.trim() || SPLASH_IMGS[Math.floor(Math.random() * SPLASH_IMGS.length)],
     waze: document.getElementById('f-waze').value.trim(),
     hours: document.getElementById('f-hours').value.trim(),
     notes: '', rating: 0, visited: false, unknown: false
