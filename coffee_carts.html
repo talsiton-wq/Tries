@@ -251,6 +251,8 @@ var localData = null;
 var dbRef = null;
 var _renderTimer = null;
 var _firstRender = true;
+var editModeIds = {};
+var editCommentState = null; // {cartId, idx}
 function deferRender() { clearTimeout(_renderTimer); _renderTimer = setTimeout(render, 0); }
 
 function load() { return localData || INITIAL; }
@@ -308,7 +310,8 @@ function parseWazeCoords(wazeUrl) {
 
 function distKm(c) {
   if (userLat === null) return null;
-  var coords = parseWazeCoords(c.waze);
+  var wazeUrl = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : c.waze;
+  var coords = parseWazeCoords(wazeUrl);
   if (!coords) return null;
   return haversine(userLat, userLng, coords.lat, coords.lng);
 }
@@ -346,6 +349,8 @@ function shareWA(e, id) {
   if (c.location) text += '\n📍 ' + c.location.replace('\n', ', ');
   if (c.hours) text += '\n🕐 ' + c.hours;
   if (c.ig) text += '\n📸 ' + c.ig;
+  var effectiveWaze = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : c.waze;
+  if (effectiveWaze) text += '\n🚗 ' + effectiveWaze;
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
@@ -353,9 +358,26 @@ function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'
 
 function commentsHtml(id, comments) {
   var list = Array.isArray(comments) ? comments : [];
-  var items = list.map(function(cm) {
+  var items = list.map(function(cm, idx) {
+    var isEditing = editCommentState && editCommentState.cartId === id && editCommentState.idx === idx;
+    if (isEditing) {
+      return '<div class="comment-item">'
+        + '<div class="comment-name">' + esc(cm.name) + '</div>'
+        + '<textarea class="comment-input" id="edit-ct-' + id + '-' + idx + '" rows="2">' + esc(cm.text) + '</textarea>'
+        + '<div style="display:flex;gap:6px;margin-top:4px">'
+          + '<button class="comment-submit" onclick="saveEditComment(' + id + ',' + idx + ')">שמור ✓</button>'
+          + '<button class="comment-submit" style="background:var(--muted)" onclick="cancelEditComment()">ביטול</button>'
+        + '</div>'
+        + '</div>';
+    }
     return '<div class="comment-item">'
-      + '<div class="comment-name">' + esc(cm.name) + '</div>'
+      + '<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+        + '<div class="comment-name">' + esc(cm.name) + '</div>'
+        + '<div style="display:flex;gap:4px">'
+          + '<button class="edit-hours-btn" onclick="startEditComment(' + id + ',' + idx + ')" title="ערוך תגובה">✏️</button>'
+          + '<button class="edit-hours-btn" onclick="deleteComment(' + id + ',' + idx + ')" title="מחק תגובה">🗑</button>'
+        + '</div>'
+      + '</div>'
       + '<div class="comment-text">' + esc(cm.text) + '</div>'
       + '<div class="comment-date">' + esc(cm.date) + '</div>'
       + '</div>';
@@ -377,6 +399,58 @@ function commentsHtml(id, comments) {
 function toggleCommentForm(id) {
   var form = document.getElementById('cf-' + id);
   if (form) form.classList.toggle('open');
+}
+
+function deleteComment(cartId, idx) {
+  var d = load();
+  var c = d.find(function(x) { return x.id === cartId; });
+  if (!c || !Array.isArray(c.comments)) return;
+  c.comments.splice(idx, 1);
+  save(d);
+  if (editCommentState && editCommentState.cartId === cartId && editCommentState.idx === idx) editCommentState = null;
+  deferRender();
+}
+
+function startEditComment(cartId, idx) {
+  editCommentState = { cartId: cartId, idx: idx };
+  deferRender();
+}
+
+function saveEditComment(cartId, idx) {
+  var el = document.getElementById('edit-ct-' + cartId + '-' + idx);
+  var text = el ? el.value.trim() : '';
+  if (!text) return;
+  var d = load();
+  var c = d.find(function(x) { return x.id === cartId; });
+  if (!c || !Array.isArray(c.comments) || !c.comments[idx]) return;
+  c.comments[idx].text = text;
+  save(d);
+  editCommentState = null;
+  deferRender();
+}
+
+function cancelEditComment() {
+  editCommentState = null;
+  deferRender();
+}
+
+function toggleEditMode(id) {
+  editModeIds[id] = !editModeIds[id];
+  deferRender();
+}
+
+function saveCartEdit(id) {
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c) return;
+  var fields = ['name','sub','location','ig','waze'];
+  fields.forEach(function(f) {
+    var el = document.getElementById('edit-' + f + '-' + id);
+    if (el) c[f] = el.value.trim();
+  });
+  save(d);
+  editModeIds[id] = false;
+  deferRender();
 }
 
 function submitComment(id) {
@@ -410,20 +484,27 @@ function igUsername(url) {
 
 function openIG(e, url) {
   e.preventDefault();
+  var isAndroid = /Android/i.test(navigator.userAgent);
+  var isChrome  = /Chrome/i.test(navigator.userAgent) && !/Safari/.test(navigator.userAgent.replace('Chrome',''));
   var username = igUsername(url);
-  if (username) {
-    // ניסיון לפתוח ישירות באפליקציה
+  // Build path relative to instagram.com for the intent URL
+  var m = url.match(/instagram\.com(\/[^?#]*)/);
+  var igPath = m ? m[1] : '/';
+  if (!igPath.endsWith('/')) igPath += '/';
+
+  if (isAndroid) {
+    // Chrome Android: use intent:// to open the Instagram app directly
+    var intentUrl = 'intent://instagram.com' + igPath + '#Intent;scheme=https;package=com.instagram.android;end';
+    window.location.href = intentUrl;
+  } else if (username) {
+    // iOS Safari: deep-link into app, fallback to web
     var appUrl = 'instagram://user?username=' + username;
     var start = Date.now();
     window.location = appUrl;
-    // אם האפליקציה לא נפתחה תוך 1.5 שניות - נפתח בדפדפן
     setTimeout(function() {
-      if (Date.now() - start < 2000) {
-        window.open(url, '_blank');
-      }
+      if (Date.now() - start < 2000) window.open(url, '_blank');
     }, 1500);
   } else {
-    // reel או קישור ישיר - פתח בדפדפן
     window.open(url, '_blank');
   }
 }
@@ -484,23 +565,44 @@ function renderGrid(data) {
         + '<div class="card-img-placeholder" style="display:none"><span class="big-emoji">☕</span></div>'
       : '<div class="card-img-placeholder"><span class="big-emoji">☕</span></div>';
     var delBtn = '<button class="delete-btn" onclick="askDelete(' + c.id + ')" title="מחק">🗑</button>';
-    var bodyHtml = c.unknown
-      ? '<div class="name-row"><input class="inline-input" style="flex:1;margin:0" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">' + delBtn + '</div>'
-        + '<input class="inline-input" value="' + (c.location||'') + '" placeholder="מיקום..." onchange="upLoc(' + c.id + ',this.value)">'
-      : '<div class="name-row"><div class="cart-name" style="flex:1">' + (c.name||'') + '</div>' + delBtn + '</div>'
+    var editToggleBtn = '<button class="edit-hours-btn" onclick="toggleEditMode(' + c.id + ')" title="ערוך עגלה" style="margin-left:4px">✏️</button>';
+    var isEditMode = !!editModeIds[c.id];
+    var bodyHtml;
+    if (c.unknown) {
+      bodyHtml = '<div class="name-row"><input class="inline-input" style="flex:1;margin:0" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">' + delBtn + '</div>'
+        + '<input class="inline-input" value="' + (c.location||'') + '" placeholder="מיקום..." onchange="upLoc(' + c.id + ',this.value)">';
+    } else if (isEditMode) {
+      bodyHtml = '<div class="name-row" style="flex-wrap:wrap;gap:6px">'
+        + '<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:5px">'
+          + '<input class="inline-input" id="edit-name-' + c.id + '" value="' + esc(c.name||'') + '" placeholder="שם...">'
+          + '<input class="inline-input" id="edit-sub-' + c.id + '" value="' + esc(c.sub||'') + '" placeholder="תיאור קצר...">'
+          + '<input class="inline-input" id="edit-location-' + c.id + '" value="' + esc(c.location||'') + '" placeholder="מיקום...">'
+          + '<input class="inline-input" id="edit-ig-' + c.id + '" value="' + esc(c.ig||'') + '" placeholder="קישור אינסטגרם...">'
+          + '<input class="inline-input" id="edit-waze-' + c.id + '" value="' + esc(c.waze||'') + '" placeholder="קישור Waze...">'
+        + '</div>'
+        + '<div style="display:flex;flex-direction:column;gap:4px">'
+          + '<button class="comment-submit" onclick="saveCartEdit(' + c.id + ')">שמור ✓</button>'
+          + '<button class="comment-submit" style="background:var(--muted)" onclick="toggleEditMode(' + c.id + ')">ביטול</button>'
+          + delBtn
+        + '</div>'
+        + '</div>';
+    } else {
+      bodyHtml = '<div class="name-row"><div class="cart-name" style="flex:1">' + (c.name||'') + '</div>' + editToggleBtn + delBtn + '</div>'
         + (c.sub ? '<div class="cart-sub">' + c.sub + '</div>' : '')
         + '<div class="cart-location">📍 <span>' + locLines + '</span></div>';
+    }
     var openStatus = isOpen(c.hours);
     var openHtml = openStatus === null ? ''
       : openStatus ? '<span class="open-badge open">🟢 פתוח עכשיו</span>'
                    : '<span class="open-badge closed">🔴 סגור</span>';
     var km = distKm(c);
     var distHtml = km !== null ? '<span class="dist-badge">📍 ' + (km < 1 ? Math.round(km * 1000) + ' מ׳' : km.toFixed(1) + ' ק״מ') + '</span>' : '';
+    var effectiveWaze = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : (c.waze || '');
     var footerLinks = '';
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
-    if (c.waze) {
-      footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
-      var llMatch = c.waze.match(/ll=([-\d.]+),([-\d.]+)/);
+    if (effectiveWaze) {
+      footerLinks += '<a class="waze-btn" href="' + effectiveWaze + '" onclick="openWaze(event,\'' + effectiveWaze + '\')">🚗 Waze</a>';
+      var llMatch = effectiveWaze.match(/ll=([-\d.]+),([-\d.]+)/);
       if (llMatch) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch[1] + ',' + llMatch[2] + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
     }
     footerLinks += '<a class="wa-btn" href="#" onclick="shareWA(event,' + c.id + ')">💬 שתף</a>';
