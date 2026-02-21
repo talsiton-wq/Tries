@@ -437,7 +437,6 @@ function renderGrid(data) {
       + '<div class="card-body">'
         + bodyHtml
         + openHtml
-        + commentsHtml(c.id, c.comments)
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
@@ -449,6 +448,7 @@ function renderGrid(data) {
           + '</div>'
         + '<div class="notes-label" style="margin-top:10px">הערות אישיות</div>'
         + '<textarea class="notes-area" placeholder="מה אהבת? מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
+        + commentsHtml(c.id, c.comments)
         + '<div class="card-footer">'
           + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + footerLinks
