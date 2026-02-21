@@ -319,22 +319,14 @@ function parseWazeCoords(wazeUrl) {
 }
 
 var CITY_COORDS = {
+  // ערים ראשיות
   'תל אביב':        {lat:32.0853, lng:34.7818},
   'ת"א':            {lat:32.0853, lng:34.7818},
-  'רמת אביב':       {lat:32.1117, lng:34.8042},
-  'הרצליה':         {lat:32.1663, lng:34.8434},
-  'הרצליה פיתוח':  {lat:32.1500, lng:34.8000},
-  'ראש העין':       {lat:32.0956, lng:34.9551},
-  'נתניה':          {lat:32.3226, lng:34.8533},
-  'אבן יהודה':      {lat:32.2685, lng:34.8899},
-  'חרות':           {lat:32.2614, lng:34.9394},
-  'עדנים':          {lat:32.2311, lng:35.0272},
-  'בית חנה':        {lat:32.4786, lng:35.0267},
-  'חופית':          {lat:32.3947, lng:34.8522},
-  'פולג':           {lat:32.3100, lng:34.8500},
+  'תל-אביב':        {lat:32.0853, lng:34.7818},
   'ירושלים':        {lat:31.7683, lng:35.2137},
   'חיפה':           {lat:32.7940, lng:34.9896},
   'באר שבע':        {lat:31.2530, lng:34.7915},
+  'נתניה':          {lat:32.3226, lng:34.8533},
   'פתח תקווה':      {lat:32.0869, lng:34.8878},
   'ראשון לציון':    {lat:31.9730, lng:34.7898},
   'רחובות':         {lat:31.8969, lng:34.8186},
@@ -356,23 +348,96 @@ var CITY_COORDS = {
   'עפולה':          {lat:32.6082, lng:35.2886},
   'צפת':            {lat:32.9642, lng:35.4960},
   'עכו':            {lat:32.9231, lng:35.0713},
-  'נהריה':          {lat:33.0077, lng:35.0972}
+  'נהריה':          {lat:33.0077, lng:35.0972},
+  // שכונות ת"א
+  'שרונה':          {lat:32.0686, lng:34.7897},
+  'נווה צדק':       {lat:32.0595, lng:34.7614},
+  'פלורנטין':       {lat:32.0558, lng:34.7680},
+  'יפו':            {lat:32.0528, lng:34.7520},
+  'הצפון הישן':     {lat:32.0987, lng:34.7791},
+  'הצפון החדש':     {lat:32.1056, lng:34.7897},
+  'לב תל אביב':     {lat:32.0784, lng:34.7766},
+  'כרם התימנים':    {lat:32.0640, lng:34.7700},
+  'מרכז תל אביב':   {lat:32.0784, lng:34.7766},
+  'דיזנגוף':        {lat:32.0800, lng:34.7740},
+  'רוטשילד':        {lat:32.0645, lng:34.7742},
+  'הדר יוסף':       {lat:32.1134, lng:34.8284},
+  'רמת החייל':      {lat:32.1163, lng:34.8342},
+  'אפקה':           {lat:32.1211, lng:34.8436},
+  'קריית שלום':     {lat:32.0268, lng:34.7701},
+  'נווה שרת':       {lat:32.0851, lng:34.8178},
+  // שרון והמרכז
+  'הרצליה':         {lat:32.1663, lng:34.8434},
+  'הרצליה פיתוח':   {lat:32.1500, lng:34.8000},
+  'ראש העין':       {lat:32.0956, lng:34.9551},
+  'אבן יהודה':      {lat:32.2685, lng:34.8899},
+  'חרות':           {lat:32.2614, lng:34.9394},
+  'עדנים':          {lat:32.2311, lng:35.0272},
+  'בית חנה':        {lat:32.4786, lng:35.0267},
+  'חופית':          {lat:32.3947, lng:34.8522},
+  'פולג':           {lat:32.3100, lng:34.8500},
+  'רמת אביב':       {lat:32.1117, lng:34.8042},
+  'גני תקווה':      {lat:32.0602, lng:34.8904},
+  'יהוד':           {lat:32.0330, lng:34.8873},
+  'אור יהודה':      {lat:32.0280, lng:34.8574},
+  'אזור':           {lat:32.0181, lng:34.8038},
+  'בת חפר':         {lat:32.3631, lng:34.9267},
+  'עמק חפר':        {lat:32.3500, lng:34.9300},
+  'חדרה':           {lat:32.4340, lng:34.9171},
+  'זכרון יעקב':     {lat:32.5708, lng:34.9517}
 };
+
+var _geocodePending = {};
+
+function cityLookup(location) {
+  if (!location) return null;
+  // Try full string, then each line separately (last line is usually the city)
+  var candidates = [location].concat(location.split('\n').reverse());
+  for (var ci = 0; ci < candidates.length; ci++) {
+    var seg = candidates[ci].trim();
+    for (var city in CITY_COORDS) {
+      if (seg.indexOf(city) >= 0) return CITY_COORDS[city];
+    }
+  }
+  return null;
+}
+
+function tryGeocode(c) {
+  if (!c.location || _geocodePending[c.id]) return;
+  _geocodePending[c.id] = true;
+  var q = c.location.replace(/\n/g, ', ') + ', ישראל';
+  fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=il&q=' + encodeURIComponent(q))
+    .then(function(r) { return r.json(); })
+    .then(function(results) {
+      if (!results || !results[0]) return;
+      var r0 = results[0];
+      var d = load();
+      var cart = d.find(function(x) { return x.id === c.id; });
+      if (cart && !cart._geocodedCoords) {
+        cart._geocodedCoords = {lat: parseFloat(r0.lat), lng: parseFloat(r0.lon)};
+        save(d);
+        deferRender();
+      }
+    })
+    .catch(function() { delete _geocodePending[c.id]; });
+}
 
 function distKmFull(c) {
   if (userLat === null) return null;
   var wazeUrl = (c.id && WAZE_COORDS[c.id]) ? WAZE_COORDS[c.id] : c.waze;
   var coords = parseWazeCoords(wazeUrl);
   var approx = false;
-  if (!coords && c.location) {
-    var loc = c.location;
-    for (var city in CITY_COORDS) {
-      if (loc.indexOf(city) >= 0) {
-        coords = CITY_COORDS[city];
-        approx = true;
-        break;
-      }
-    }
+  if (!coords) {
+    coords = cityLookup(c.location);
+    if (coords) approx = true;
+  }
+  if (!coords && c._geocodedCoords) {
+    coords = c._geocodedCoords;
+    approx = true;
+  }
+  if (!coords && c.location && !_geocodePending[c.id]) {
+    // No match yet — kick off async geocoding; result will appear on next render
+    tryGeocode(c);
   }
   if (!coords) return null;
   return { km: haversine(userLat, userLng, coords.lat, coords.lng), approx: approx };
@@ -961,6 +1026,15 @@ dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
   if (raw) {
     localData = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
+    // Patch carts missing an image — assign a deterministic Splash photo
+    var patched = false;
+    localData.forEach(function(c) {
+      if (!c.img) {
+        c.img = SPLASH_IMGS[(c.id || Date.now()) % SPLASH_IMGS.length];
+        patched = true;
+      }
+    });
+    if (patched) dbRef.set(localData).catch(function() {});
   } else {
     // First time — seed Firebase from INITIAL
     localData = INITIAL.map(function(ic) { return Object.assign({}, ic); });
