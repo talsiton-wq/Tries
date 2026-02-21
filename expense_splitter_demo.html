@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>מחלק הוצאות – דמו</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f0f4f8;
+      color: #2d3748;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      color: white;
+      padding: 20px 24px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+    }
+    header h1 { font-size: 1.8rem; margin-bottom: 4px; }
+    header p   { opacity: 0.85; font-size: 0.9rem; }
+
+    .demo-banner {
+      background: #fef9c3;
+      border-bottom: 2px solid #fde047;
+      text-align: center;
+      padding: 8px;
+      font-size: 0.85rem;
+      color: #713f12;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .card h2 {
+      font-size: 1.1rem;
+      color: #4f46e5;
+      margin-bottom: 14px;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    input[type="text"], input[type="number"], select {
+      flex: 1;
+      min-width: 120px;
+      padding: 10px 14px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    input:focus, select:focus { border-color: #4f46e5; }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-family: inherit;
+      font-weight: 600;
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    button:active { transform: scale(0.97); }
+
+    .btn-primary { background: #4f46e5; color: white; }
+    .btn-primary:hover { opacity: 0.9; }
+    .btn-sm { padding: 4px 10px; font-size: 0.8rem; border-radius: 6px; }
+    .btn-danger { background: #ef4444; color: white; }
+    .btn-gray   { background: #e2e8f0; color: #4a5568; }
+
+    /* Members */
+    .members-wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      min-height: 32px;
+    }
+    .chip {
+      background: #eef2ff;
+      color: #4f46e5;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .chip button {
+      padding: 0;
+      background: none;
+      color: #a0aec0;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+    .chip button:hover { color: #ef4444; }
+
+    /* Split checkboxes */
+    .split-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .split-row span { font-size: 0.85rem; color: #718096; }
+    .cb-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .cb-list label {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #f7f8fc;
+      border: 2px solid #e2e8f0;
+      padding: 5px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .cb-list label:has(input:checked) {
+      border-color: #4f46e5;
+      background: #eef2ff;
+      color: #4f46e5;
+    }
+    .cb-list input { accent-color: #4f46e5; }
+
+    /* Expenses */
+    .expense-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      background: #f7f8fc;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+    .e-info { flex: 1; }
+    .e-desc  { font-weight: 600; }
+    .e-meta  { font-size: 0.82rem; color: #718096; margin-top: 2px; }
+    .e-amt   { font-weight: 700; color: #4f46e5; font-size: 1.05rem; white-space: nowrap; }
+
+    /* Balances */
+    .bal-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+    }
+    .bal-pos  { background: #f0fdf4; }
+    .bal-neg  { background: #fff5f5; }
+    .bal-zero { background: #f7f8fc; color: #a0aec0; }
+    .bal-amt  { font-weight: 700; font-size: 1.05rem; }
+    .green { color: #16a34a; }
+    .red   { color: #dc2626; }
+
+    /* Settlements */
+    .settle-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff7ed;
+      border: 2px solid #fed7aa;
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+    .settle-text { font-size: 0.95rem; }
+    .settle-amt  { font-weight: 700; color: #ea580c; font-size: 1.05rem; }
+    .arrow       { margin: 0 6px; color: #94a3b8; }
+
+    .empty { text-align: center; color: #a0aec0; padding: 18px; font-size: 0.9rem; }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1e293b;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      transition: transform 0.3s;
+      z-index: 999;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+
+    @media (max-width: 600px) {
+      .input-row { flex-direction: column; }
+      .btn-primary { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>💰 מחלק הוצאות</h1>
+  <p>כל אחד משלם, הכל מסתדר</p>
+</header>
+
+<div class="demo-banner">
+  ⚠️ גרסת דמו – הנתונים נשמרים רק בדפדפן זה. גרסת Firebase תסנכרן בין כל המכשירים.
+</div>
+
+<div class="container">
+
+  <!-- חברי קבוצה -->
+  <div class="card">
+    <h2>👥 חברי הקבוצה</h2>
+    <div class="input-row">
+      <input type="text" id="memberInput" placeholder="שם החבר/ה" />
+      <button class="btn-primary" onclick="addMember()">הוסף</button>
+    </div>
+    <div class="members-wrap" id="membersList"></div>
+  </div>
+
+  <!-- הוסף תשלום -->
+  <div class="card">
+    <h2>➕ הוסף תשלום</h2>
+    <div class="input-row">
+      <input type="text"   id="expDesc"   placeholder="תיאור (פיצה, נסיעה...)" />
+      <input type="number" id="expAmount" placeholder="סכום (₪)" min="0" step="0.01" />
+    </div>
+    <div class="input-row" style="margin-top:10px;">
+      <select id="payerSel"><option value="">מי שילם?</option></select>
+    </div>
+    <div class="split-row">
+      <span>חלוקה בין:</span>
+      <button class="btn-sm btn-gray" onclick="selectAll()">בחר הכל</button>
+    </div>
+    <div class="cb-list" id="cbList"><div class="empty">הוסף חברים כדי לבחור</div></div>
+    <div style="margin-top:14px;">
+      <button class="btn-primary" onclick="addExpense()">הוסף תשלום</button>
+    </div>
+  </div>
+
+  <!-- היסטוריה -->
+  <div class="card">
+    <h2>📋 היסטוריית תשלומים</h2>
+    <div id="expensesList"><div class="empty">אין תשלומים עדיין</div></div>
+  </div>
+
+  <!-- יתרות -->
+  <div class="card">
+    <h2>📊 מצב כרגע</h2>
+    <div id="balancesList"><div class="empty">אין נתונים עדיין</div></div>
+  </div>
+
+  <!-- סילוקים -->
+  <div class="card">
+    <h2>🤝 מה צריך לשלם</h2>
+    <div id="settleList"><div class="empty">הכל מאוזן! 🎉</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Storage (יוחלף ב-Firebase) ────────────────────────────────────────────────
+const DB = {
+  load() {
+    return {
+      members:  JSON.parse(localStorage.getItem('members')  || '[]'),
+      expenses: JSON.parse(localStorage.getItem('expenses') || '[]'),
+    };
+  },
+  save(state) {
+    localStorage.setItem('members',  JSON.stringify(state.members));
+    localStorage.setItem('expenses', JSON.stringify(state.expenses));
+  }
+};
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let state = DB.load();
+
+// ── Toast ─────────────────────────────────────────────────────────────────────
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Members ───────────────────────────────────────────────────────────────────
+function addMember() {
+  const input = document.getElementById('memberInput');
+  const name  = input.value.trim();
+  if (!name) return toast('נא להזין שם');
+  if (state.members.includes(name)) return toast('החבר/ה כבר קיים/ת');
+  state.members.push(name);
+  input.value = '';
+  persist();
+}
+
+function removeMember(name) {
+  const used = state.expenses.some(e => e.payer === name || e.splitAmong.includes(name));
+  if (used) return toast(`לא ניתן למחוק – ${name} מופיע/ה בתשלומים`);
+  state.members = state.members.filter(m => m !== name);
+  persist();
+}
+
+// ── Expenses ──────────────────────────────────────────────────────────────────
+function addExpense() {
+  const desc       = document.getElementById('expDesc').value.trim();
+  const amount     = parseFloat(document.getElementById('expAmount').value);
+  const payer      = document.getElementById('payerSel').value;
+  const splitAmong = [...document.querySelectorAll('#cbList input:checked')].map(c => c.value);
+
+  if (!desc)              return toast('נא להזין תיאור');
+  if (!amount || amount <= 0) return toast('נא להזין סכום תקין');
+  if (!payer)             return toast('נא לבחור מי שילם');
+  if (!splitAmong.length) return toast('נא לבחור לפחות אדם אחד');
+
+  state.expenses.unshift({
+    id: Date.now(),
+    desc, amount, payer, splitAmong,
+    date: new Date().toLocaleDateString('he-IL')
+  });
+
+  document.getElementById('expDesc').value   = '';
+  document.getElementById('expAmount').value = '';
+  document.getElementById('payerSel').value  = '';
+  selectAll();
+  toast('✅ תשלום נוסף');
+  persist();
+}
+
+function removeExpense(id) {
+  state.expenses = state.expenses.filter(e => e.id !== id);
+  toast('🗑 נמחק');
+  persist();
+}
+
+// ── Calculations ──────────────────────────────────────────────────────────────
+function calcBalances() {
+  const bal = {};
+  state.members.forEach(m => bal[m] = 0);
+  state.expenses.forEach(e => {
+    const share = e.amount / e.splitAmong.length;
+    bal[e.payer] = (bal[e.payer] || 0) + e.amount;
+    e.splitAmong.forEach(m => { bal[m] = (bal[m] || 0) - share; });
+  });
+  return bal;
+}
+
+function calcSettlements(bal) {
+  const pos = [], neg = [];
+  Object.entries(bal).forEach(([name, v]) => {
+    if (v >  0.005) pos.push({ name, v });
+    if (v < -0.005) neg.push({ name, v: -v });
+  });
+  pos.sort((a,b) => b.v - a.v);
+  neg.sort((a,b) => b.v - a.v);
+
+  const txns = [];
+  let i = 0, j = 0;
+  while (i < pos.length && j < neg.length) {
+    const settle = Math.min(pos[i].v, neg[j].v);
+    txns.push({ from: neg[j].name, to: pos[i].name, amount: settle });
+    pos[i].v -= settle;
+    neg[j].v -= settle;
+    if (pos[i].v < 0.005) i++;
+    if (neg[j].v < 0.005) j++;
+  }
+  return txns;
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function render() {
+  const { members, expenses } = state;
+
+  // Members chips
+  const ml = document.getElementById('membersList');
+  ml.innerHTML = members.length
+    ? members.map(m => `
+        <div class="chip">
+          ${m}
+          <button onclick="removeMember('${m}')">×</button>
+        </div>`).join('')
+    : '<div class="empty" style="padding:8px">טרם נוספו חברים</div>';
+
+  // Payer select
+  const sel = document.getElementById('payerSel');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">מי שילם?</option>' +
+    members.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+
+  // Split checkboxes
+  const cb = document.getElementById('cbList');
+  cb.innerHTML = members.length
+    ? members.map(m => `
+        <label>
+          <input type="checkbox" value="${m}" checked />
+          ${m}
+        </label>`).join('')
+    : '<div class="empty">הוסף חברים כדי לבחור</div>';
+
+  // Expenses
+  const el = document.getElementById('expensesList');
+  el.innerHTML = expenses.length
+    ? expenses.map(e => `
+        <div class="expense-item">
+          <div class="e-info">
+            <div class="e-desc">${e.desc}</div>
+            <div class="e-meta">
+              שילם: <strong>${e.payer}</strong> |
+              חלוקה: ${e.splitAmong.join(', ')} | ${e.date}
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div class="e-amt">₪${e.amount.toFixed(2)}</div>
+            <button class="btn-sm btn-danger" onclick="removeExpense(${e.id})">מחק</button>
+          </div>
+        </div>`).join('')
+    : '<div class="empty">אין תשלומים עדיין</div>';
+
+  // Balances
+  const bal = calcBalances();
+  const bl  = document.getElementById('balancesList');
+  const entries = Object.entries(bal);
+  bl.innerHTML = entries.length
+    ? entries.map(([name, v]) => {
+        const cls   = v >  0.005 ? 'bal-pos'  : v < -0.005 ? 'bal-neg'  : 'bal-zero';
+        const amtCls= v >  0.005 ? 'green'    : v < -0.005 ? 'red'      : '';
+        const label = v >  0.005 ? 'חייבים לך': v < -0.005 ? 'אתה/את חייב/ת' : 'מאוזן ✓';
+        return `
+          <div class="bal-item ${cls}">
+            <span>${name} — ${label}</span>
+            <span class="bal-amt ${amtCls}">₪${Math.abs(v).toFixed(2)}</span>
+          </div>`;
+      }).join('')
+    : '<div class="empty">אין נתונים עדיין</div>';
+
+  // Settlements
+  const txns = calcSettlements(bal);
+  const sl   = document.getElementById('settleList');
+  sl.innerHTML = txns.length
+    ? txns.map(t => `
+        <div class="settle-item">
+          <span class="settle-text">
+            <strong>${t.from}</strong>
+            <span class="arrow">→</span>
+            <strong>${t.to}</strong>
+          </span>
+          <span class="settle-amt">₪${t.amount.toFixed(2)}</span>
+        </div>`).join('')
+    : '<div class="empty">הכל מאוזן! 🎉</div>';
+}
+
+function selectAll() {
+  document.querySelectorAll('#cbList input').forEach(c => c.checked = true);
+}
+
+function persist() {
+  DB.save(state);
+  render();
+}
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+document.getElementById('memberInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addMember();
+});
+
+render();
+</script>
+
+</body>
+</html>
