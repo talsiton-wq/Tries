@@ -207,6 +207,20 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 
 <script>
 var KEY = 'cafe_carts_v9';
+var WAZE_COORDS = {
+  1:  "https://waze.com/ul?ll=32.3839974,34.8711871&navigate=yes",
+  2:  "https://waze.com/ul?ll=32.1704914,34.8025603&navigate=yes",
+  3:  "https://waze.com/ul?ll=32.23833,34.91740&navigate=yes",
+  4:  "https://waze.com/ul?ll=32.1055048,34.7980642&navigate=yes",
+  5:  "https://waze.com/ul?ll=32.0745789,34.7821292&navigate=yes",
+  9:  "https://waze.com/ul?ll=32.1077847,34.797396&navigate=yes",
+  10: "https://waze.com/ul?ll=32.2785166,34.8934118&navigate=yes",
+  11: "https://waze.com/ul?ll=32.1060398,34.9436696&navigate=yes",
+  12: "https://waze.com/ul?ll=32.2774773,34.862573&navigate=yes",
+  13: "https://waze.com/ul?ll=32.1395959,34.9062955&navigate=yes",
+  14: "https://waze.com/ul?ll=32.13361,34.91111&navigate=yes",
+  15: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes"
+};
 var INITIAL = [
   {id:1,  name:"שולק׳ה",        sub:"Shulke Coffee",                  location:"מרכז לב, חופית\nליד כביש 2",              ig:"https://www.instagram.com/shulke.coffee/",        waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes",                                                                                                              img:"IMG_2464.jpeg",                                                                       imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", hours:"א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור",                                              notes:"", rating:0, visited:false, unknown:false},
   {id:2,  name:"Cafe Tiran",     sub:"קפה טירן",                       location:"רח׳ קדושי השואה 56\nהרצליה פיתוח",         ig:"https://www.instagram.com/cafe_tiran/",           waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes",                                                                        img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85",               hours:"א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
@@ -306,8 +320,7 @@ function igLabel(url) {
 
 function openWaze(e, wazeUrl) {
   e.preventDefault();
-  var q = wazeUrl.replace('waze://?q=','').replace('&navigate=yes','');
-  window.open('https://waze.com/ul?q=' + q + '&navigate=yes', '_blank');
+  window.open(wazeUrl, '_blank');
 }
 
 function openMaps(e, q) {
