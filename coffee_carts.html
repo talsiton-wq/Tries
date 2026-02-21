@@ -54,6 +54,19 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .visited-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:var(--muted);padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;cursor:pointer;margin-right:auto;white-space:nowrap;}
 .visited-btn.visited{background:var(--visited-bg);border-color:rgba(46,204,113,0.4);color:var(--visited);}
 .wa-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25d366;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
+.comments-section{margin-top:10px;border-top:1px solid var(--border);padding-top:8px;}
+.comments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.comments-title{font-size:0.75rem;color:var(--muted);font-weight:600;}
+.add-comment-btn{background:rgba(196,122,43,0.15);border:1px solid rgba(196,122,43,0.35);color:var(--caramel);width:22px;height:22px;border-radius:50%;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.comment-item{background:rgba(255,255,255,0.04);border-radius:9px;padding:7px 10px;margin-bottom:5px;}
+.comment-name{font-size:0.71rem;font-weight:700;color:var(--golden);}
+.comment-text{font-size:0.8rem;color:var(--cream);margin-top:2px;white-space:pre-wrap;}
+.comment-date{font-size:0.64rem;color:var(--muted);margin-top:3px;}
+.comment-form{display:none;margin-top:7px;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;border:1px solid var(--border);}
+.comment-form.open{display:block;}
+.comment-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;outline:none;direction:rtl;margin-bottom:6px;resize:none;}
+.comment-input::placeholder{color:var(--muted);}
+.comment-submit{background:var(--caramel);color:var(--espresso);border:none;border-radius:8px;padding:6px 14px;font-family:'Heebo',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
 .inline-input{width:100%;background:rgba(255,255,255,0.06);border:1px dashed rgba(196,122,43,0.4);border-radius:8px;padding:7px 10px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;outline:none;direction:rtl;margin-bottom:7px;}
 .inline-input::placeholder{color:rgba(245,234,216,0.25);}
 #view-map{display:none;padding:20px 20px 110px;max-width:1200px;margin:0 auto;}
@@ -284,6 +297,52 @@ function shareWA(e, id) {
   window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
 }
 
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function commentsHtml(id, comments) {
+  var list = Array.isArray(comments) ? comments : [];
+  var items = list.map(function(cm) {
+    return '<div class="comment-item">'
+      + '<div class="comment-name">' + esc(cm.name) + '</div>'
+      + '<div class="comment-text">' + esc(cm.text) + '</div>'
+      + '<div class="comment-date">' + esc(cm.date) + '</div>'
+      + '</div>';
+  }).join('');
+  return '<div class="comments-section">'
+    + '<div class="comments-header">'
+      + '<span class="comments-title">💬 ' + (list.length ? list.length + ' תגובות' : 'תגובות') + '</span>'
+      + '<button class="add-comment-btn" onclick="toggleCommentForm(' + id + ')" title="הוסף תגובה">＋</button>'
+    + '</div>'
+    + items
+    + '<div class="comment-form" id="cf-' + id + '">'
+      + '<input class="comment-input" id="cn-' + id + '" placeholder="שמך (אופציונלי)..." maxlength="40">'
+      + '<textarea class="comment-input" id="ct-' + id + '" placeholder="מה תרצה לשתף?" rows="2"></textarea>'
+      + '<button class="comment-submit" onclick="submitComment(' + id + ')">שלח ✓</button>'
+    + '</div>'
+  + '</div>';
+}
+
+function toggleCommentForm(id) {
+  var form = document.getElementById('cf-' + id);
+  if (form) form.classList.toggle('open');
+}
+
+function submitComment(id) {
+  var nameEl = document.getElementById('cn-' + id);
+  var textEl = document.getElementById('ct-' + id);
+  var name = (nameEl ? nameEl.value : '').trim();
+  var text = (textEl ? textEl.value : '').trim();
+  if (!text) return;
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c) return;
+  if (!Array.isArray(c.comments)) c.comments = [];
+  var now = new Date();
+  c.comments.push({ name: name || 'אנונימי', text: text, date: now.getDate() + '/' + (now.getMonth()+1) + '/' + (now.getFullYear()%100) });
+  save(d);
+  renderGrid(d);
+}
+
 function igUsername(url) {
   if (!url) return null;
   var m = url.match(/instagram\.com\/([^/?#\n]+)/);
@@ -378,6 +437,7 @@ function renderGrid(data) {
       + '<div class="card-body">'
         + bodyHtml
         + openHtml
+        + commentsHtml(c.id, c.comments)
         + galleryHtml
         + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
