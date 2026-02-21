@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>מחלק הוצאות – דמו</title>
+  <title>מחלק הוצאות</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -17,19 +17,30 @@
     header {
       background: linear-gradient(135deg, #4f46e5, #7c3aed);
       color: white;
-      padding: 20px 24px;
-      text-align: center;
+      padding: 18px 24px;
       box-shadow: 0 4px 12px rgba(79,70,229,0.3);
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    header h1 { font-size: 1.8rem; margin-bottom: 4px; }
-    header p   { opacity: 0.85; font-size: 0.9rem; }
+    header h1 { font-size: 1.4rem; flex: 1; }
+    header p   { opacity: 0.8; font-size: 0.85rem; }
+    #backBtn {
+      background: rgba(255,255,255,0.2);
+      color: white;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: none;
+    }
+    #backBtn:hover { background: rgba(255,255,255,0.3); }
 
     .demo-banner {
       background: #fef9c3;
       border-bottom: 2px solid #fde047;
       text-align: center;
-      padding: 8px;
-      font-size: 0.85rem;
+      padding: 7px;
+      font-size: 0.82rem;
       color: #713f12;
     }
 
@@ -48,17 +59,9 @@
       padding: 20px;
       box-shadow: 0 2px 12px rgba(0,0,0,0.08);
     }
-    .card h2 {
-      font-size: 1.1rem;
-      color: #4f46e5;
-      margin-bottom: 14px;
-    }
+    .card h2 { font-size: 1.1rem; color: #4f46e5; margin-bottom: 14px; }
 
-    .input-row {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .input-row { display: flex; gap: 10px; flex-wrap: wrap; }
     input[type="text"], input[type="number"], select {
       flex: 1;
       min-width: 120px;
@@ -83,98 +86,102 @@
       transition: transform 0.1s, opacity 0.2s;
     }
     button:active { transform: scale(0.97); }
-
     .btn-primary { background: #4f46e5; color: white; }
     .btn-primary:hover { opacity: 0.9; }
     .btn-sm { padding: 4px 10px; font-size: 0.8rem; border-radius: 6px; }
     .btn-danger { background: #ef4444; color: white; }
     .btn-gray   { background: #e2e8f0; color: #4a5568; }
 
-    /* Members */
-    .members-wrap {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 12px;
-      min-height: 32px;
-    }
-    .chip {
-      background: #eef2ff;
-      color: #4f46e5;
-      padding: 5px 14px;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .chip button {
-      padding: 0;
-      background: none;
-      color: #a0aec0;
-      font-size: 1.1rem;
-      line-height: 1;
-    }
-    .chip button:hover { color: #ef4444; }
+    /* ── Home screen ── */
+    #homeScreen { display: block; }
+    #groupScreen { display: none; }
 
-    /* Split checkboxes */
-    .split-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 10px;
-      flex-wrap: wrap;
+    .home-title {
+      text-align: center;
+      padding: 10px 0 6px;
     }
-    .split-row span { font-size: 0.85rem; color: #718096; }
-    .cb-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 6px;
+    .home-title h2 { font-size: 1.3rem; color: #4f46e5; }
+    .home-title p  { color: #718096; font-size: 0.9rem; margin-top: 4px; }
+
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 14px;
     }
-    .cb-list label {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #f7f8fc;
+    .group-card {
+      background: white;
       border: 2px solid #e2e8f0;
-      padding: 5px 14px;
-      border-radius: 20px;
+      border-radius: 14px;
+      padding: 18px;
       cursor: pointer;
-      font-size: 0.9rem;
-      transition: border-color 0.15s, background 0.15s;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      position: relative;
     }
-    .cb-list label:has(input:checked) {
+    .group-card:hover {
       border-color: #4f46e5;
-      background: #eef2ff;
-      color: #4f46e5;
+      box-shadow: 0 4px 16px rgba(79,70,229,0.15);
     }
+    .group-card-name { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+    .group-card-meta { font-size: 0.8rem; color: #a0aec0; }
+    .group-card-del {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: none;
+      color: #cbd5e0;
+      font-size: 1.1rem;
+      padding: 2px 6px;
+    }
+    .group-card-del:hover { color: #ef4444; }
+
+    .new-group-card {
+      background: #f0f4f8;
+      border: 2px dashed #cbd5e0;
+      border-radius: 14px;
+      padding: 18px;
+      cursor: pointer;
+      text-align: center;
+      color: #718096;
+      transition: border-color 0.2s, color 0.2s;
+      font-size: 0.95rem;
+    }
+    .new-group-card:hover { border-color: #4f46e5; color: #4f46e5; }
+    .new-group-card span  { display: block; font-size: 1.6rem; margin-bottom: 4px; }
+
+    /* ── Group inner ── */
+    .chip {
+      background: #eef2ff; color: #4f46e5;
+      padding: 5px 14px; border-radius: 20px;
+      font-size: 0.9rem; display: flex; align-items: center; gap: 6px;
+    }
+    .chip button { padding: 0; background: none; color: #a0aec0; font-size: 1.1rem; }
+    .chip button:hover { color: #ef4444; }
+    .members-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; min-height: 32px; }
+
+    .split-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .split-row span { font-size: 0.85rem; color: #718096; }
+    .cb-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+    .cb-list label {
+      display: flex; align-items: center; gap: 6px;
+      background: #f7f8fc; border: 2px solid #e2e8f0;
+      padding: 5px 14px; border-radius: 20px; cursor: pointer;
+      font-size: 0.9rem; transition: border-color 0.15s, background 0.15s;
+    }
+    .cb-list label:has(input:checked) { border-color: #4f46e5; background: #eef2ff; color: #4f46e5; }
     .cb-list input { accent-color: #4f46e5; }
 
-    /* Expenses */
     .expense-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      background: #f7f8fc;
-      border-radius: 10px;
-      padding: 12px 16px;
-      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center; gap: 10px;
+      background: #f7f8fc; border-radius: 10px; padding: 12px 16px; margin-bottom: 8px;
     }
     .e-info { flex: 1; }
-    .e-desc  { font-weight: 600; }
-    .e-meta  { font-size: 0.82rem; color: #718096; margin-top: 2px; }
-    .e-amt   { font-weight: 700; color: #4f46e5; font-size: 1.05rem; white-space: nowrap; }
+    .e-desc { font-weight: 600; }
+    .e-meta { font-size: 0.82rem; color: #718096; margin-top: 2px; }
+    .e-amt  { font-weight: 700; color: #4f46e5; font-size: 1.05rem; white-space: nowrap; }
 
-    /* Balances */
     .bal-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 14px;
-      border-radius: 10px;
-      margin-bottom: 6px;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 14px; border-radius: 10px; margin-bottom: 6px;
     }
     .bal-pos  { background: #f0fdf4; }
     .bal-neg  { background: #fff5f5; }
@@ -183,36 +190,22 @@
     .green { color: #16a34a; }
     .red   { color: #dc2626; }
 
-    /* Settlements */
     .settle-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff7ed;
-      border: 2px solid #fed7aa;
-      border-radius: 12px;
-      padding: 12px 16px;
-      margin-bottom: 8px;
+      display: flex; justify-content: space-between; align-items: center;
+      background: #fff7ed; border: 2px solid #fed7aa;
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 8px;
     }
-    .settle-text { font-size: 0.95rem; }
     .settle-amt  { font-weight: 700; color: #ea580c; font-size: 1.05rem; }
-    .arrow       { margin: 0 6px; color: #94a3b8; }
+    .arrow { margin: 0 6px; color: #94a3b8; }
 
     .empty { text-align: center; color: #a0aec0; padding: 18px; font-size: 0.9rem; }
 
-    /* Toast */
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
-      background: #1e293b;
-      color: white;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-size: 0.9rem;
-      transition: transform 0.3s;
-      z-index: 999;
+      background: #1e293b; color: white;
+      padding: 12px 24px; border-radius: 12px; font-size: 0.9rem;
+      transition: transform 0.3s; z-index: 999;
     }
     .toast.show { transform: translateX(-50%) translateY(0); }
 
@@ -225,92 +218,192 @@
 <body>
 
 <header>
-  <h1>💰 מחלק הוצאות</h1>
-  <p>כל אחד משלם, הכל מסתדר</p>
+  <button id="backBtn" onclick="goHome()">→ חזור</button>
+  <div style="flex:1">
+    <h1 id="headerTitle">💰 מחלק הוצאות</h1>
+    <p id="headerSub">בחר קבוצה או צור אחת חדשה</p>
+  </div>
 </header>
 
 <div class="demo-banner">
-  ⚠️ גרסת דמו – הנתונים נשמרים רק בדפדפן זה. גרסת Firebase תסנכרן בין כל המכשירים.
+  ⚠️ גרסת דמו – נתונים נשמרים רק בדפדפן זה. גרסת Firebase תסנכרן בין כל המכשירים.
 </div>
 
-<div class="container">
+<!-- ══ HOME SCREEN ════════════════════════════════════════════════════════════ -->
+<div id="homeScreen">
+  <div class="container">
 
-  <!-- חברי קבוצה -->
-  <div class="card">
-    <h2>👥 חברי הקבוצה</h2>
-    <div class="input-row">
-      <input type="text" id="memberInput" placeholder="שם החבר/ה" />
-      <button class="btn-primary" onclick="addMember()">הוסף</button>
+    <div class="home-title">
+      <h2>הקבוצות שלי</h2>
+      <p>כל קבוצה היא סשן נפרד עם חברים ותשלומים משלה</p>
     </div>
-    <div class="members-wrap" id="membersList"></div>
-  </div>
 
-  <!-- הוסף תשלום -->
-  <div class="card">
-    <h2>➕ הוסף תשלום</h2>
-    <div class="input-row">
-      <input type="text"   id="expDesc"   placeholder="תיאור (פיצה, נסיעה...)" />
-      <input type="number" id="expAmount" placeholder="סכום (₪)" min="0" step="0.01" />
+    <div class="groups-grid" id="groupsGrid">
+      <!-- rendered by JS -->
     </div>
-    <div class="input-row" style="margin-top:10px;">
-      <select id="payerSel"><option value="">מי שילם?</option></select>
+
+  </div>
+</div>
+
+<!-- ══ GROUP SCREEN ═══════════════════════════════════════════════════════════ -->
+<div id="groupScreen">
+  <div class="container">
+
+    <!-- חברים -->
+    <div class="card">
+      <h2>👥 חברי הקבוצה</h2>
+      <div class="input-row">
+        <input type="text" id="memberInput" placeholder="שם החבר/ה" />
+        <button class="btn-primary" onclick="addMember()">הוסף</button>
+      </div>
+      <div class="members-wrap" id="membersList"></div>
     </div>
-    <div class="split-row">
-      <span>חלוקה בין:</span>
-      <button class="btn-sm btn-gray" onclick="selectAll()">בחר הכל</button>
+
+    <!-- תשלום -->
+    <div class="card">
+      <h2>➕ הוסף תשלום</h2>
+      <div class="input-row">
+        <input type="text"   id="expDesc"   placeholder="תיאור (פיצה, נסיעה...)" />
+        <input type="number" id="expAmount" placeholder="סכום (₪)" min="0" step="0.01" />
+      </div>
+      <div class="input-row" style="margin-top:10px;">
+        <select id="payerSel"><option value="">מי שילם?</option></select>
+      </div>
+      <div class="split-row">
+        <span>חלוקה בין:</span>
+        <button class="btn-sm btn-gray" onclick="selectAll()">בחר הכל</button>
+      </div>
+      <div class="cb-list" id="cbList"><div class="empty">הוסף חברים כדי לבחור</div></div>
+      <div style="margin-top:14px;">
+        <button class="btn-primary" onclick="addExpense()">הוסף תשלום</button>
+      </div>
     </div>
-    <div class="cb-list" id="cbList"><div class="empty">הוסף חברים כדי לבחור</div></div>
-    <div style="margin-top:14px;">
-      <button class="btn-primary" onclick="addExpense()">הוסף תשלום</button>
+
+    <!-- היסטוריה -->
+    <div class="card">
+      <h2>📋 היסטוריית תשלומים</h2>
+      <div id="expensesList"><div class="empty">אין תשלומים עדיין</div></div>
     </div>
-  </div>
 
-  <!-- היסטוריה -->
-  <div class="card">
-    <h2>📋 היסטוריית תשלומים</h2>
-    <div id="expensesList"><div class="empty">אין תשלומים עדיין</div></div>
-  </div>
+    <!-- יתרות -->
+    <div class="card">
+      <h2>📊 מצב כרגע</h2>
+      <div id="balancesList"><div class="empty">אין נתונים עדיין</div></div>
+    </div>
 
-  <!-- יתרות -->
-  <div class="card">
-    <h2>📊 מצב כרגע</h2>
-    <div id="balancesList"><div class="empty">אין נתונים עדיין</div></div>
-  </div>
+    <!-- סילוקים -->
+    <div class="card">
+      <h2>🤝 מה צריך לשלם</h2>
+      <div id="settleList"><div class="empty">הכל מאוזן! 🎉</div></div>
+    </div>
 
-  <!-- סילוקים -->
-  <div class="card">
-    <h2>🤝 מה צריך לשלם</h2>
-    <div id="settleList"><div class="empty">הכל מאוזן! 🎉</div></div>
   </div>
-
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-// ── Storage (יוחלף ב-Firebase) ────────────────────────────────────────────────
-const DB = {
-  load() {
-    return {
-      members:  JSON.parse(localStorage.getItem('members')  || '[]'),
-      expenses: JSON.parse(localStorage.getItem('expenses') || '[]'),
-    };
-  },
-  save(state) {
-    localStorage.setItem('members',  JSON.stringify(state.members));
-    localStorage.setItem('expenses', JSON.stringify(state.expenses));
-  }
-};
+// ── Storage ───────────────────────────────────────────────────────────────────
+function loadGroups() {
+  return JSON.parse(localStorage.getItem('groups') || '[]');
+}
+function saveGroups(groups) {
+  localStorage.setItem('groups', JSON.stringify(groups));
+}
+function loadGroupData(id) {
+  return {
+    members:  JSON.parse(localStorage.getItem(`g_${id}_members`)  || '[]'),
+    expenses: JSON.parse(localStorage.getItem(`g_${id}_expenses`) || '[]'),
+  };
+}
+function saveGroupData(id, data) {
+  localStorage.setItem(`g_${id}_members`,  JSON.stringify(data.members));
+  localStorage.setItem(`g_${id}_expenses`, JSON.stringify(data.expenses));
+}
 
 // ── State ─────────────────────────────────────────────────────────────────────
-let state = DB.load();
+let activeGroupId   = null;
+let activeGroupName = null;
+let state           = { members: [], expenses: [] };
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function toast(msg) {
   const el = document.getElementById('toast');
   el.textContent = msg;
   el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2500);
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ── Home screen ───────────────────────────────────────────────────────────────
+function renderHome() {
+  const groups = loadGroups();
+  const grid   = document.getElementById('groupsGrid');
+
+  const cards = groups.map(g => {
+    const data = loadGroupData(g.id);
+    const memberCount  = data.members.length;
+    const expenseCount = data.expenses.length;
+    const total = data.expenses.reduce((s, e) => s + e.amount, 0);
+    return `
+      <div class="group-card" onclick="openGroup('${g.id}','${escHtml(g.name)}')">
+        <button class="group-card-del btn-sm" onclick="event.stopPropagation();deleteGroup('${g.id}')">×</button>
+        <div class="group-card-name">${escHtml(g.name)}</div>
+        <div class="group-card-meta">
+          ${memberCount} חברים · ${expenseCount} תשלומים<br>
+          סה״כ: ₪${total.toFixed(2)}
+        </div>
+      </div>`;
+  }).join('');
+
+  grid.innerHTML = cards + `
+    <div class="new-group-card" onclick="createGroup()">
+      <span>＋</span>
+      קבוצה חדשה
+    </div>`;
+}
+
+function createGroup() {
+  const name = prompt('שם הקבוצה:');
+  if (!name || !name.trim()) return;
+  const groups = loadGroups();
+  const id     = Date.now().toString(36);
+  groups.push({ id, name: name.trim(), createdAt: new Date().toISOString() });
+  saveGroups(groups);
+  renderHome();
+  openGroup(id, name.trim());
+}
+
+function deleteGroup(id) {
+  if (!confirm('למחוק את הקבוצה לצמיתות?')) return;
+  const groups = loadGroups().filter(g => g.id !== id);
+  saveGroups(groups);
+  localStorage.removeItem(`g_${id}_members`);
+  localStorage.removeItem(`g_${id}_expenses`);
+  renderHome();
+}
+
+function openGroup(id, name) {
+  activeGroupId   = id;
+  activeGroupName = name;
+  state = loadGroupData(id);
+
+  document.getElementById('homeScreen').style.display  = 'none';
+  document.getElementById('groupScreen').style.display = 'block';
+  document.getElementById('backBtn').style.display     = 'inline-block';
+  document.getElementById('headerTitle').textContent   = `💰 ${name}`;
+  document.getElementById('headerSub').textContent     = 'מחלק הוצאות';
+
+  render();
+}
+
+function goHome() {
+  activeGroupId = null;
+  document.getElementById('groupScreen').style.display = 'none';
+  document.getElementById('homeScreen').style.display  = 'block';
+  document.getElementById('backBtn').style.display     = 'none';
+  document.getElementById('headerTitle').textContent   = '💰 מחלק הוצאות';
+  document.getElementById('headerSub').textContent     = 'בחר קבוצה או צור אחת חדשה';
+  renderHome();
 }
 
 // ── Members ───────────────────────────────────────────────────────────────────
@@ -338,10 +431,10 @@ function addExpense() {
   const payer      = document.getElementById('payerSel').value;
   const splitAmong = [...document.querySelectorAll('#cbList input:checked')].map(c => c.value);
 
-  if (!desc)              return toast('נא להזין תיאור');
-  if (!amount || amount <= 0) return toast('נא להזין סכום תקין');
-  if (!payer)             return toast('נא לבחור מי שילם');
-  if (!splitAmong.length) return toast('נא לבחור לפחות אדם אחד');
+  if (!desc)               return toast('נא להזין תיאור');
+  if (!amount || amount<=0) return toast('נא להזין סכום תקין');
+  if (!payer)              return toast('נא לבחור מי שילם');
+  if (!splitAmong.length)  return toast('נא לבחור לפחות אדם אחד');
 
   state.expenses.unshift({
     id: Date.now(),
@@ -402,12 +495,11 @@ function render() {
   const { members, expenses } = state;
 
   // Members chips
-  const ml = document.getElementById('membersList');
-  ml.innerHTML = members.length
+  document.getElementById('membersList').innerHTML = members.length
     ? members.map(m => `
         <div class="chip">
-          ${m}
-          <button onclick="removeMember('${m}')">×</button>
+          ${escHtml(m)}
+          <button onclick="removeMember('${escHtml(m)}')">×</button>
         </div>`).join('')
     : '<div class="empty" style="padding:8px">טרם נוספו חברים</div>';
 
@@ -415,28 +507,26 @@ function render() {
   const sel = document.getElementById('payerSel');
   const cur = sel.value;
   sel.innerHTML = '<option value="">מי שילם?</option>' +
-    members.map(m => `<option value="${m}"${m===cur?' selected':''}>${m}</option>`).join('');
+    members.map(m => `<option value="${escHtml(m)}"${m===cur?' selected':''}>${escHtml(m)}</option>`).join('');
 
   // Split checkboxes
-  const cb = document.getElementById('cbList');
-  cb.innerHTML = members.length
+  document.getElementById('cbList').innerHTML = members.length
     ? members.map(m => `
         <label>
-          <input type="checkbox" value="${m}" checked />
-          ${m}
+          <input type="checkbox" value="${escHtml(m)}" checked />
+          ${escHtml(m)}
         </label>`).join('')
     : '<div class="empty">הוסף חברים כדי לבחור</div>';
 
   // Expenses
-  const el = document.getElementById('expensesList');
-  el.innerHTML = expenses.length
+  document.getElementById('expensesList').innerHTML = expenses.length
     ? expenses.map(e => `
         <div class="expense-item">
           <div class="e-info">
-            <div class="e-desc">${e.desc}</div>
+            <div class="e-desc">${escHtml(e.desc)}</div>
             <div class="e-meta">
-              שילם: <strong>${e.payer}</strong> |
-              חלוקה: ${e.splitAmong.join(', ')} | ${e.date}
+              שילם: <strong>${escHtml(e.payer)}</strong> |
+              חלוקה: ${e.splitAmong.map(escHtml).join(', ')} | ${e.date}
             </div>
           </div>
           <div style="display:flex;align-items:center;gap:10px">
@@ -447,17 +537,16 @@ function render() {
     : '<div class="empty">אין תשלומים עדיין</div>';
 
   // Balances
-  const bal = calcBalances();
-  const bl  = document.getElementById('balancesList');
+  const bal     = calcBalances();
   const entries = Object.entries(bal);
-  bl.innerHTML = entries.length
+  document.getElementById('balancesList').innerHTML = entries.length
     ? entries.map(([name, v]) => {
-        const cls   = v >  0.005 ? 'bal-pos'  : v < -0.005 ? 'bal-neg'  : 'bal-zero';
-        const amtCls= v >  0.005 ? 'green'    : v < -0.005 ? 'red'      : '';
-        const label = v >  0.005 ? 'חייבים לך': v < -0.005 ? 'אתה/את חייב/ת' : 'מאוזן ✓';
+        const cls    = v >  0.005 ? 'bal-pos'  : v < -0.005 ? 'bal-neg'  : 'bal-zero';
+        const amtCls = v >  0.005 ? 'green'    : v < -0.005 ? 'red'      : '';
+        const label  = v >  0.005 ? 'חייבים לך': v < -0.005 ? 'אתה/את חייב/ת' : 'מאוזן ✓';
         return `
           <div class="bal-item ${cls}">
-            <span>${name} — ${label}</span>
+            <span>${escHtml(name)} — ${label}</span>
             <span class="bal-amt ${amtCls}">₪${Math.abs(v).toFixed(2)}</span>
           </div>`;
       }).join('')
@@ -465,14 +554,13 @@ function render() {
 
   // Settlements
   const txns = calcSettlements(bal);
-  const sl   = document.getElementById('settleList');
-  sl.innerHTML = txns.length
+  document.getElementById('settleList').innerHTML = txns.length
     ? txns.map(t => `
         <div class="settle-item">
-          <span class="settle-text">
-            <strong>${t.from}</strong>
+          <span>
+            <strong>${escHtml(t.from)}</strong>
             <span class="arrow">→</span>
-            <strong>${t.to}</strong>
+            <strong>${escHtml(t.to)}</strong>
           </span>
           <span class="settle-amt">₪${t.amount.toFixed(2)}</span>
         </div>`).join('')
@@ -484,8 +572,14 @@ function selectAll() {
 }
 
 function persist() {
-  DB.save(state);
+  saveGroupData(activeGroupId, state);
   render();
+}
+
+function escHtml(str) {
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
@@ -493,7 +587,7 @@ document.getElementById('memberInput').addEventListener('keydown', e => {
   if (e.key === 'Enter') addMember();
 });
 
-render();
+renderHome();
 </script>
 
 </body>
