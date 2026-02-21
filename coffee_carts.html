@@ -26,7 +26,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card{background:var(--dark-roast);border-radius:18px;overflow:hidden;border:1px solid var(--border);position:relative;transition:transform 0.25s,box-shadow 0.25s;animation:fadeUp 0.4s ease both;}
 .card:hover{transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,0.6);}
 .card.is-visited{border-color:rgba(46,204,113,0.3);}
-.card.is-visited .card-img-wrap::after{content:'✓ ביקרתי';position:absolute;top:12px;right:12px;background:var(--visited);color:#000;font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:10px;}
+.visited-badge{position:absolute;top:10px;right:10px;padding:5px 11px;border-radius:12px;font-size:0.69rem;font-weight:700;cursor:pointer;transition:all 0.25s;background:rgba(0,0,0,0.68);color:rgba(255,255,255,0.85);border:1.5px solid rgba(255,255,255,0.3);user-select:none;box-shadow:0 2px 8px rgba(0,0,0,0.55);}
+.visited-badge.visited{background:rgba(39,174,96,0.95);border-color:rgba(255,255,255,0.4);color:#fff;box-shadow:0 2px 10px rgba(39,174,96,0.5);}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
 .card-img-wrap{position:relative;height:200px;overflow:hidden;background:var(--roast);}
 .card-img{width:100%;height:100%;object-fit:cover;transition:transform 0.4s;display:block;}
@@ -34,8 +35,9 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .card-img-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;background:linear-gradient(135deg,var(--roast),var(--medium));}
 .card-img-placeholder .big-emoji{font-size:3rem;}
 .unknown-badge{position:absolute;top:12px;left:12px;background:rgba(196,122,43,0.88);color:var(--espresso);font-size:0.68rem;font-weight:700;padding:3px 10px;border-radius:10px;}
-.delete-btn{background:rgba(231,76,60,0.1);border:1px solid rgba(231,76,60,0.3);color:rgba(231,76,60,0.6);cursor:pointer;font-size:0.72rem;font-weight:700;padding:5px 11px;border-radius:20px;display:inline-flex;align-items:center;gap:4px;transition:all 0.2s;}
-.delete-btn:hover{background:rgba(231,76,60,0.25);color:var(--danger);}
+.delete-btn{background:none;border:none;color:rgba(231,76,60,0.4);cursor:pointer;font-size:1rem;padding:2px 4px;line-height:1;display:inline-flex;align-items:center;transition:color 0.2s;flex-shrink:0;}
+.delete-btn:hover{color:var(--danger);}
+.name-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:3px;}
 .card-body{padding:16px;}
 .cart-name{font-family:'Playfair Display',serif;font-size:1.25rem;color:var(--golden);margin-bottom:3px;}
 .cart-sub{font-size:0.72rem;color:var(--muted);font-style:italic;margin-bottom:7px;}
@@ -47,12 +49,25 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .notes-label{font-size:0.7rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:5px;}
 .notes-area{width:100%;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:9px;padding:9px 11px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.84rem;resize:vertical;min-height:58px;outline:none;direction:rtl;line-height:1.5;}
 .notes-area::placeholder{color:rgba(245,234,216,0.2);}
-.card-footer{display:flex;align-items:center;gap:7px;margin-top:12px;flex-wrap:wrap;}
-.ig-btn{display:inline-flex;align-items:center;gap:5px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:white;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;}
-.waze-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(0,200,100,0.1);border:1px solid rgba(0,200,100,0.25);color:#00e676;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
-.maps-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25);color:#4a90d9;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
-.visited-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:var(--muted);padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;cursor:pointer;margin-right:auto;white-space:nowrap;}
-.visited-btn.visited{background:var(--visited-bg);border-color:rgba(46,204,113,0.4);color:var(--visited);}
+.card-actions{display:flex;align-items:center;gap:7px;margin-top:10px;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:20px;padding-top:12px;border-top:1px solid var(--border);flex-wrap:nowrap;}
+.ig-btn{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#833ab4,#fd1d1d,#fcb045);color:white;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;}
+.waze-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(0,200,100,0.1);border:1px solid rgba(0,200,100,0.25);color:#00e676;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
+.maps-btn{display:inline-flex;align-items:center;gap:4px;background:rgba(66,133,244,0.1);border:1px solid rgba(66,133,244,0.25);color:#4a90d9;padding:6px 10px;border-radius:18px;font-size:0.72rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
+.wa-btn{display:inline-flex;align-items:center;gap:5px;background:rgba(37,211,102,0.1);border:1px solid rgba(37,211,102,0.25);color:#25d366;padding:7px 13px;border-radius:18px;font-size:0.76rem;font-weight:600;text-decoration:none;white-space:nowrap;cursor:pointer;}
+.comments-section{margin-top:10px;border-top:1px solid var(--border);padding-top:8px;}
+.comments-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px;}
+.comments-title{font-size:0.75rem;color:var(--muted);font-weight:600;}
+.add-comment-btn{background:rgba(196,122,43,0.15);border:1px solid rgba(196,122,43,0.35);color:var(--caramel);width:22px;height:22px;border-radius:50%;font-size:0.85rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.comment-item{background:rgba(255,255,255,0.04);border-radius:9px;padding:7px 10px;margin-bottom:5px;}
+.comment-name{font-size:0.71rem;font-weight:700;color:var(--golden);}
+.comment-text{font-size:0.8rem;color:var(--cream);margin-top:2px;white-space:pre-wrap;}
+.comment-date{font-size:0.64rem;color:var(--muted);margin-top:3px;}
+.comment-form{display:none;margin-top:7px;background:rgba(255,255,255,0.03);border-radius:10px;padding:10px;border:1px solid var(--border);}
+.comment-form.open{display:block;}
+.comment-input{width:100%;background:rgba(255,255,255,0.06);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;outline:none;direction:rtl;margin-bottom:6px;resize:none;}
+.comment-input::placeholder{color:var(--muted);}
+.comment-submit{background:var(--caramel);color:var(--espresso);border:none;border-radius:8px;padding:6px 14px;font-family:'Heebo',sans-serif;font-size:0.8rem;font-weight:700;cursor:pointer;}
 .inline-input{width:100%;background:rgba(255,255,255,0.06);border:1px dashed rgba(196,122,43,0.4);border-radius:8px;padding:7px 10px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.82rem;outline:none;direction:rtl;margin-bottom:7px;}
 .inline-input::placeholder{color:rgba(245,234,216,0.25);}
 #view-map{display:none;padding:20px 20px 110px;max-width:1200px;margin:0 auto;}
@@ -93,14 +108,27 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .btn-merge{background:rgba(46,204,113,0.8);color:#000;border:none;padding:10px 22px;border-radius:10px;font-family:'Heebo',sans-serif;font-weight:700;font-size:0.9rem;cursor:pointer;}
 .btn-cc{background:transparent;color:var(--muted);border:1px solid rgba(245,234,216,0.15);padding:10px 18px;border-radius:10px;font-family:'Heebo',sans-serif;font-size:0.9rem;cursor:pointer;}
 #toast{display:none;position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(30,14,0,0.95);border:1px solid var(--caramel);color:var(--cream);padding:10px 22px;border-radius:30px;font-size:0.88rem;z-index:500;white-space:nowrap;}
-.card-img[src="IMG_2464.jpeg"]{object-position:center 90%;transform:scale(2);transform-origin:center 90%;}
+.card-img[src="IMG_2464.jpeg"]{object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;}
+.img-gallery{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap;align-items:center;}
+.img-thumb{width:50px;height:50px;object-fit:cover;border-radius:8px;cursor:pointer;border:2px solid transparent;opacity:0.7;transition:all 0.2s;flex-shrink:0;}
+.img-thumb.is-main{border-color:var(--golden);opacity:1;}
+.img-thumb:hover{opacity:1;}
+.img-upload-lbl{width:50px;height:50px;border-radius:8px;border:1px dashed rgba(196,122,43,0.4);background:rgba(255,255,255,0.03);color:var(--muted);font-size:1.3rem;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background 0.2s;}
+.img-upload-lbl:hover{background:rgba(196,122,43,0.1);}
+.cart-hours{font-size:0.8rem;color:var(--cream);margin-bottom:10px;display:flex;align-items:center;gap:5px;line-height:1.6;flex-wrap:wrap;}
+.cart-hours .hours-text{color:var(--cream);opacity:0.85;}
+.cart-hours .hours-empty{color:var(--muted);font-style:italic;}
+.cart-hours .edit-hours-btn{background:none;border:none;color:var(--muted);font-size:0.75rem;cursor:pointer;padding:0 2px;line-height:1;flex-shrink:0;}
+.open-badge{display:inline-flex;align-items:center;gap:4px;font-size:0.72rem;font-weight:700;padding:3px 10px;border-radius:12px;margin-bottom:8px;}
+.open-badge.open{background:rgba(46,204,113,0.12);color:#2ecc71;border:1px solid rgba(46,204,113,0.3);}
+.open-badge.closed{background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid rgba(231,76,60,0.2);}
+.dist-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:12px;background:rgba(66,133,244,0.12);color:#4a90d9;border:1px solid rgba(66,133,244,0.25);margin-right:6px;}
 </style>
 </head>
 <body>
 <header>
   <span class="header-icon">☕</span>
   <h1>עגלות קפה אהובות</h1>
-  <p class="subtitle">האוסף האישי שלי</p>
 </header>
 
 <div class="controls">
@@ -110,6 +138,8 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
     <button class="tab-btn" onclick="setView('map',this)">🗺 רשימה</button>
   </div>
   <button class="filter-btn" id="filter-visited" onclick="toggleVisitedFilter()">✓ ביקרתי</button>
+  <button class="filter-btn" id="filter-open" onclick="toggleOpenFilter()">🟢 פתוח עכשיו</button>
+  <button class="filter-btn" id="sort-dist" onclick="toggleDistSort()">📍 קרוב אלי</button>
   <span class="count-badge" id="count">0 עגלות</span>
 </div>
 
@@ -134,9 +164,23 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
     <input type="text" id="f-img" placeholder="https://..." />
     <div class="field-label">קישור Waze</div>
     <input type="text" id="f-waze" placeholder="https://waze.com/ul?q=..." />
+    <div class="field-label">שעות פתיחה</div>
+    <input type="text" id="f-hours" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" />
     <div class="modal-btns">
       <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
       <button class="btn-add" onclick="addCart()">הוסף ☕</button>
+    </div>
+  </div>
+</div>
+
+<!-- HOURS EDIT MODAL -->
+<div class="confirm-overlay" id="hours-overlay">
+  <div class="confirm-box" style="text-align:right">
+    <h3>🕐 שעות פתיחה</h3>
+    <input id="f-hours-edit" type="text" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.9rem;margin:12px 0;outline:none;direction:rtl;">
+    <div class="confirm-btns">
+      <button class="btn-cc" onclick="closeHoursModal()">ביטול</button>
+      <button class="btn-ok" onclick="doSaveHours()">שמור</button>
     </div>
   </div>
 </div>
@@ -159,6 +203,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
 
 <script>
 var KEY = 'cafe_carts_v9';
@@ -177,22 +222,25 @@ var WAZE_COORDS = {
   15: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes"
 };
 var INITIAL = [
-  {id:1, name:"שולק׳ה", sub:"Shulke Coffee", location:"מרכז לב, חופית\nליד כביש 2", ig:"https://www.instagram.com/shulke.coffee/", waze:WAZE_COORDS[1], img:"IMG_2464.jpeg", imgStyle:"object-position:center 90%;transform:scale(2);transform-origin:center 90%;", notes:"", rating:0, visited:false, unknown:false},
-  {id:2, name:"Cafe Tiran", sub:"קפה טירן", location:"רח׳ קדושי השואה 56\nהרצליה פיתוח", ig:"https://www.instagram.com/cafe_tiran/", waze:WAZE_COORDS[2], img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:3, name:"דשא גדול", sub:"Deshe Gadol", location:"מושב חרות\nעמק חפר", ig:"https://www.instagram.com/deshe_gadol/", waze:WAZE_COORDS[3], img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:4, name:"אוטוטו", sub:"Ottoto — גינת גרונימן", location:"גינת גרונימן\nרמת אביב, תל אביב", ig:"https://www.instagram.com/reel/DUcp9R1Apf8/", waze:WAZE_COORDS[4], img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:5, name:"האחים", sub:"Haachim", location:"אבן גבירול 26\nתל אביב", ig:"https://www.instagram.com/reel/DUaN31bDRSH/", waze:WAZE_COORDS[5], img:"https://images.unsplash.com/photo-1517244683847-7456b63c5969?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:9, name:"Its Beit Hana", sub:"Beit Hanna Brodetsky Café", location:"ת״א", ig:"https://www.instagram.com/reel/DUs0tA5jLAm/", waze:WAZE_COORDS[9], img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:10, name:"לוטי", sub:"Loti Bakery", location:"התמר 18\nאבן יהודה", ig:"https://www.instagram.com/reel/DUvpDyUDf5C/", waze:WAZE_COORDS[10], img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:11, name:"קפה לאגו", sub:"Caffe Lago — כשר מהדרין", location:"שכונה חדשה\nראש העין", ig:"https://www.instagram.com/caffe.lago/", waze:WAZE_COORDS[11], img:"https://images.unsplash.com/photo-1439539698758-ba2680ecadb9?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:12, name:"קפה בורשטיין", sub:"Burstein Coffee & Bakery", location:"האומנות 16\nמתחם פולג, נתניה", ig:"https://www.instagram.com/bursteinpoleg/", waze:WAZE_COORDS[12], img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:13, name:"גילטי", sub:"GILTI — עגלת קפה ומאפייה", location:"מושב עדנים\nליד מגרש הכדורסל", ig:"https://www.instagram.com/gilti_family_bakery/", waze:WAZE_COORDS[13], img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:14, name:"אסתריקה", sub:"Esterika Truck על הירקון", location:"מתחם המועצה האזורית\nדרום השרון", ig:"https://www.instagram.com/esterika_cafe/", waze:WAZE_COORDS[14], img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85", notes:"", rating:0, visited:false, unknown:false},
-  {id:15, name:"Verde", sub:"ורדה", location:"הרצליה", ig:"", waze:WAZE_COORDS[15], img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=700&q=85", notes:"", rating:0, visited:false, unknown:false}
+  {id:1,  name:"שולק׳ה",        sub:"Shulke Coffee",                  location:"מרכז לב, חופית\nליד כביש 2",              ig:"https://www.instagram.com/shulke.coffee/",        waze:"waze://?q=%D7%97%D7%95%D7%A4%D7%99%D7%AA+%D7%9E%D7%A8%D7%9B%D7%96+%D7%9C%D7%91&navigate=yes",                                                                                                              img:"IMG_2464.jpeg",                                                                       imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", hours:"א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור",                                              notes:"", rating:0, visited:false, unknown:false},
+  {id:2,  name:"Cafe Tiran",     sub:"קפה טירן",                       location:"רח׳ קדושי השואה 56\nהרצליה פיתוח",         ig:"https://www.instagram.com/cafe_tiran/",           waze:"waze://?q=%D7%A7%D7%93%D7%95%D7%A9%D7%99+%D7%94%D7%A9%D7%95%D%90%D7%94+56+%D7%94%D7%A8%D7%A6%D7%9C%D7%99%D7%94&navigate=yes",                                                                        img:"https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=700&q=85",               hours:"א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:3,  name:"דשא גדול",       sub:"Deshe Gadol",                    location:"מושב חרות\nעמק חפר",                      ig:"https://www.instagram.com/deshe_gadol/",          waze:"waze://?q=%D7%9E%D7%95%D7%A9%D7%91+%D7%97%D7%A8%D7%95%D7%AA&navigate=yes",                                                                                                                          img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85",            hours:"א׳–ה׳: 08:00–18:00 | ו׳: 08:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:4,  name:"אוטוטו",         sub:"Ottoto — גינת גרונימן",          location:"גינת גרונימן\nרמת אביב, תל אביב",         ig:"https://www.instagram.com/reel/DUcp9R1Apf8/",    waze:"waze://?q=%D7%92%D7%99%D7%A0%D7%AA+%D7%92%D7%A8%D7%95%D7%A0%D7%99%D7%9E%D7%9F+%D7%A8%D7%9E%D7%AA+%D7%90%D7%91%D7%99%D7%91&navigate=yes",                                                       img:"https://images.unsplash.com/photo-1600093463592-8e36ae95ef56?w=700&q=85",            hours:"א׳–ה׳: 07:30–19:00 | ו׳: 07:30–15:30 | ש׳: 08:30–19:00",                              notes:"", rating:0, visited:false, unknown:false},
+  {id:5,  name:"האחים",          sub:"Haachim",                        location:"אבן גבירול 26\nתל אביב",                  ig:"https://www.instagram.com/reel/DUaN31bDRSH/",    waze:"waze://?q=%D7%90%D7%91%D7%9F+%D7%92%D7%91%D7%99%D7%A8%D7%95%D7%9C+26+%D7%AA%D7%9C+%D7%90%D7%91%D7%99%D7%91&navigate=yes",                                                                        img:"https://images.unsplash.com/photo-1517244683847-7456b63c5969?w=700&q=85",            hours:"א׳–ו׳: 08:00–23:00 | ש׳: 12:00–23:00",                                                notes:"", rating:0, visited:false, unknown:false},
+  {id:9,  name:"Its Beit Hana",  sub:"עגלת קפה",                       location:"בית חנה",                                 ig:"https://www.instagram.com/reel/DUs0tA5jLAm/",    waze:"waze://?q=%D7%91%D7%99%D7%AA+%D7%97%D7%A0%D7%94&navigate=yes",                                                                                                                                    img:"https://images.unsplash.com/photo-1521017432531-fbd92d768814?w=700&q=85",            hours:"א׳–ה׳: 07:00–18:30 | ו׳: 07:00–15:00 | ש׳: 08:00–15:00",                              notes:"", rating:0, visited:false, unknown:false},
+  {id:10, name:"לוטי",           sub:"Loti Bakery",                    location:"התמר 18\nאבן יהודה",                      ig:"https://www.instagram.com/reel/DUvpDyUDf5C/",    waze:"waze://?q=%D7%94%D7%AA%D7%9E%D7%A8+18+%D7%90%D7%91%D7%9F+%D7%99%D7%94%D7%95%D7%93%D7%94&navigate=yes",                                                                                        img:"https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=700&q=85",            hours:"א׳–ה׳: 07:30–20:00 | ו׳: 07:30–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:11, name:"קפה לאגו",       sub:"Caffe Lago — כשר מהדרין",        location:"שכונה חדשה\nראש העין",                    ig:"https://www.instagram.com/caffe.lago/",           waze:"waze://?q=%D7%A7%D7%A4%D7%94+%D7%9C%D7%90%D7%92%D7%95+%D7%A8%D7%90%D7%A9+%D7%94%D7%A2%D7%99%D7%9F&navigate=yes",                                                                             img:"https://images.unsplash.com/photo-1439539698758-ba2680ecadb9?w=700&q=85",            hours:"א׳–ה׳: 08:30–22:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:12, name:"קפה בורשטיין",   sub:"Burstein Coffee & Bakery",       location:"האומנות 16\nמתחם פולג, נתניה",            ig:"https://www.instagram.com/bursteinpoleg/",        waze:"waze://?q=%D7%94%D7%90%D7%95%D7%9E%D7%A0%D7%95%D7%AA+16+%D7%A4%D7%95%D7%9C%D7%92+%D7%A0%D7%AA%D7%A0%D7%99%D7%94&navigate=yes",                                                               img:"https://images.unsplash.com/photo-1442512595331-e89e73853f31?w=700&q=85",            hours:"א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור",                                     notes:"", rating:0, visited:false, unknown:false},
+  {id:13, name:"גילטי",          sub:"GILTI — עגלת קפה ומאפייה",       location:"מושב עדנים\nליד מגרש הכדורסל",           ig:"https://www.instagram.com/gilti_family_bakery/", waze:"waze://?q=%D7%92%D7%99%D7%9C%D7%98%D7%99+%D7%A2%D7%92%D7%9C%D7%AA+%D7%A7%D7%A4%D7%94+%D7%9E%D7%95%D7%A9%D7%91+%D7%A2%D7%93%D7%A0%D7%99%D7%9D&navigate=yes",                                    img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85",            hours:"א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור",                                  notes:"", rating:0, visited:false, unknown:false},
+  {id:14, name:"אסתריקה",        sub:"Esterika Truck על הירקון",        location:"מתחם המועצה האזורית\nדרום השרון",         ig:"https://www.instagram.com/esterika_cafe/",        waze:"waze://?q=%D7%90%D7%A1%D7%AA%D7%A8%D7%99%D7%A7%D7%94+truck+%D7%99%D7%A8%D7%A7%D7%95%D7%9F&navigate=yes",                                                                                    img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85",            hours:"א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור", notes:"", rating:0, visited:false, unknown:false},
+  {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"אגם הצלילים\nראש העין",                                        ig:"https://www.instagram.com/agama_cafe",            waze:"waze://?q=32.1000953,34.9638264&navigate=yes",                                                                                                                                             img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                      notes:"", rating:0, visited:false, unknown:false}
 ];
 
 var filterVal = '';
 var showOnlyVisited = false;
+var showOnlyOpen = false;
+var sortByDist = false;
+var userLat = null, userLng = null;
 var pendingDelId = null;
 var pendingImport = null;
 var toastTimer = null;
@@ -200,6 +248,62 @@ var localData = null;
 var dbRef = null;
 
 function load() { return localData || INITIAL; }
+
+function isOpen(hours) {
+  if (!hours) return null;
+  var dayMap = {'א':0,'ב':1,'ג':2,'ד':3,'ה':4,'ו':5,'ש':6};
+  var now = new Date();
+  var today = now.getDay();
+  var curMin = now.getHours() * 60 + now.getMinutes();
+  var segments = hours.split('|');
+  for (var i = 0; i < segments.length; i++) {
+    var seg = segments[i].trim();
+    var col = seg.indexOf(':');
+    if (col < 0) continue;
+    var dayPart = seg.substring(0, col).replace(/׳/g,'').replace(/\s/g,'');
+    var timePart = seg.substring(col + 1).trim();
+    var days = [];
+    var dash = dayPart.search(/[–\-]/);
+    if (dash >= 0) {
+      var s = dayMap[dayPart[0]], e = dayMap[dayPart[dayPart.length-1]];
+      if (s !== undefined && e !== undefined) for (var d = s; d <= e; d++) days.push(d);
+    } else {
+      if (dayMap[dayPart[0]] !== undefined) days.push(dayMap[dayPart[0]]);
+    }
+    if (days.indexOf(today) < 0) continue;
+    if (timePart.indexOf('סגור') >= 0) return false;
+    var m = timePart.match(/(\d{1,2}):(\d{2})[–\-](\d{1,2}):(\d{2})/);
+    if (!m) continue;
+    var open = parseInt(m[1])*60+parseInt(m[2]);
+    var close = parseInt(m[3])*60+parseInt(m[4]);
+    return curMin >= open && curMin < close;
+  }
+  return false;
+}
+
+function haversine(lat1, lon1, lat2, lon2) {
+  var R = 6371;
+  var dLat = (lat2 - lat1) * Math.PI / 180;
+  var dLon = (lon2 - lon1) * Math.PI / 180;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2) +
+          Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+          Math.sin(dLon/2)*Math.sin(dLon/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function parseWazeCoords(wazeUrl) {
+  if (!wazeUrl) return null;
+  var q = wazeUrl.replace('waze://?q=','').replace('&navigate=yes','');
+  var m = q.match(/^(-?\d+\.\d+),(-?\d+\.\d+)$/);
+  return m ? {lat: parseFloat(m[1]), lng: parseFloat(m[2])} : null;
+}
+
+function distKm(c) {
+  if (userLat === null) return null;
+  var coords = parseWazeCoords(c.waze);
+  if (!coords) return null;
+  return haversine(userLat, userLng, coords.lat, coords.lng);
+}
 
 function save(d) {
   localData = d;
@@ -209,9 +313,9 @@ function save(d) {
 function igLabel(url) {
   if (!url) return null;
   var m = url.match(/instagram\.com\/([^/?#\n]+)/);
-  if (!m) return 'Instagram';
+  if (!m) return 'IG';
   var p = m[1].split('/').filter(Boolean);
-  return (p[0] === 'reel' || p[0] === 'p') ? '📽 Reel' : '@' + p[0];
+  return (p[0] === 'reel' || p[0] === 'p') ? '📽 Reel' : 'IG';
 }
 
 function openWaze(e, wazeUrl) {
@@ -221,8 +325,66 @@ function openWaze(e, wazeUrl) {
 
 function openMaps(e, q) {
   e.preventDefault();
-  // comgooglemaps:// לא עובד מ-iframe, אז נשתמש ב-universal link
   window.open('https://maps.google.com/maps?q=' + q, '_blank');
+}
+
+function shareWA(e, id) {
+  e.preventDefault();
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c) return;
+  var text = '☕ *' + (c.name || '') + '*';
+  if (c.sub) text += ' — ' + c.sub;
+  if (c.location) text += '\n📍 ' + c.location.replace('\n', ', ');
+  if (c.hours) text += '\n🕐 ' + c.hours;
+  if (c.ig) text += '\n📸 ' + c.ig;
+  window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank');
+}
+
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function commentsHtml(id, comments) {
+  var list = Array.isArray(comments) ? comments : [];
+  var items = list.map(function(cm) {
+    return '<div class="comment-item">'
+      + '<div class="comment-name">' + esc(cm.name) + '</div>'
+      + '<div class="comment-text">' + esc(cm.text) + '</div>'
+      + '<div class="comment-date">' + esc(cm.date) + '</div>'
+      + '</div>';
+  }).join('');
+  return '<div class="comments-section">'
+    + '<div class="comments-header">'
+      + '<span class="comments-title">💬 ' + (list.length ? list.length + ' תגובות' : 'תגובות') + '</span>'
+      + '<button class="add-comment-btn" onclick="toggleCommentForm(' + id + ')" title="הוסף תגובה">＋</button>'
+    + '</div>'
+    + items
+    + '<div class="comment-form" id="cf-' + id + '">'
+      + '<input class="comment-input" id="cn-' + id + '" placeholder="שמך (אופציונלי)..." maxlength="40">'
+      + '<textarea class="comment-input" id="ct-' + id + '" placeholder="מה תרצה לשתף?" rows="2"></textarea>'
+      + '<button class="comment-submit" onclick="submitComment(' + id + ')">שלח ✓</button>'
+    + '</div>'
+  + '</div>';
+}
+
+function toggleCommentForm(id) {
+  var form = document.getElementById('cf-' + id);
+  if (form) form.classList.toggle('open');
+}
+
+function submitComment(id) {
+  var nameEl = document.getElementById('cn-' + id);
+  var textEl = document.getElementById('ct-' + id);
+  var name = (nameEl ? nameEl.value : '').trim();
+  var text = (textEl ? textEl.value : '').trim();
+  if (!text) return;
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c) return;
+  if (!Array.isArray(c.comments)) c.comments = [];
+  var now = new Date();
+  c.comments.push({ name: name || 'אנונימי', text: text, date: now.getDate() + '/' + (now.getMonth()+1) + '/' + (now.getFullYear()%100) });
+  save(d);
+  renderGrid(d);
 }
 
 function igUsername(url) {
@@ -262,12 +424,23 @@ function starsHtml(id, r) {
 }
 
 function filtered(data) {
-  return data.filter(function(c) {
+  var arr = data.filter(function(c) {
     if (showOnlyVisited && !c.visited) return false;
+    if (showOnlyOpen && !isOpen(c.hours)) return false;
     if (!filterVal) return true;
     var q = filterVal.toLowerCase();
     return (c.name||'').toLowerCase().indexOf(q) >= 0 || (c.location||'').toLowerCase().indexOf(q) >= 0;
   });
+  if (sortByDist && userLat !== null) {
+    arr.sort(function(a, b) {
+      var da = distKm(a), db = distKm(b);
+      if (da === null && db === null) return 0;
+      if (da === null) return 1;
+      if (db === null) return -1;
+      return da - db;
+    });
+  }
+  return arr;
 }
 
 function renderGrid(data) {
@@ -287,34 +460,54 @@ function renderGrid(data) {
       ? '<img class="card-img" src="' + c.img + '" alt="" style="' + imgStyle + '" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">'
         + '<div class="card-img-placeholder" style="display:none"><span class="big-emoji">☕</span></div>'
       : '<div class="card-img-placeholder"><span class="big-emoji">☕</span></div>';
+    var delBtn = '<button class="delete-btn" onclick="askDelete(' + c.id + ')" title="מחק">🗑</button>';
     var bodyHtml = c.unknown
-      ? '<input class="inline-input" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">'
+      ? '<div class="name-row"><input class="inline-input" style="flex:1;margin:0" value="' + (c.name||'') + '" placeholder="✏️ שם העגלה..." onchange="upName(' + c.id + ',this.value)">' + delBtn + '</div>'
         + '<input class="inline-input" value="' + (c.location||'') + '" placeholder="מיקום..." onchange="upLoc(' + c.id + ',this.value)">'
-      : '<div class="cart-name">' + (c.name||'') + '</div>'
+      : '<div class="name-row"><div class="cart-name" style="flex:1">' + (c.name||'') + '</div>' + delBtn + '</div>'
         + (c.sub ? '<div class="cart-sub">' + c.sub + '</div>' : '')
         + '<div class="cart-location">📍 <span>' + locLines + '</span></div>';
+    var openStatus = isOpen(c.hours);
+    var openHtml = openStatus === null ? ''
+      : openStatus ? '<span class="open-badge open">🟢 פתוח עכשיו</span>'
+                   : '<span class="open-badge closed">🔴 סגור</span>';
+    var km = distKm(c);
+    var distHtml = km !== null ? '<span class="dist-badge">📍 ' + (km < 1 ? Math.round(km * 1000) + ' מ׳' : km.toFixed(1) + ' ק״מ') + '</span>' : '';
     var footerLinks = '';
     if (c.ig) footerLinks += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')">' + label + '</a>';
-    if (c.waze) {
-      footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
-      var llMatch = c.waze.match(/ll=([\d.]+),([\d.]+)/);
-      if (llMatch) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch[1] + ',' + llMatch[2] + '\')">🗺 Maps</a>';
-    }
+    var wazeQ = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
+    if (c.waze) footerLinks += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')">🚗 Waze</a>';
+    if (wazeQ) footerLinks += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ + '\')"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
+    footerLinks += '<a class="wa-btn" href="#" onclick="shareWA(event,' + c.id + ')">💬 שתף</a>';
+    var extras = Array.isArray(c.extraImages) ? c.extraImages : [];
+    var galleryHtml = '<div class="img-gallery">'
+      + (c.img ? '<img class="img-thumb is-main" src="' + c.img + '" title="תמונה ראשית">' : '')
+      + extras.map(function(u) {
+          return '<img class="img-thumb" src="' + u + '" onclick="setMainImg(' + c.id + ',\'' + u.replace(/'/g,"\\'") + '\')" title="הגדר כראשית">';
+        }).join('')
+      + '<label class="img-upload-lbl" title="הוסף תמונה">📷<input type="file" accept="image/*" style="display:none" onchange="uploadImg(' + c.id + ',this)"></label>'
+      + '</div>';
     el.innerHTML =
       '<div class="card-img-wrap">'
         + imgHtml
         + (c.unknown ? '<div class="unknown-badge">לא ידוע</div>' : '')
+        + '<div class="visited-badge' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</div>'
       + '</div>'
       + '<div class="card-body">'
         + bodyHtml
-        + '<div class="rating-row"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
+        + openHtml + distHtml
+        + galleryHtml
+        + '<div class="rating-row" style="margin-top:10px"><div class="stars">' + starsHtml(c.id, c.rating) + '</div>'
         + (c.rating ? '<span style="font-size:0.78rem;color:var(--muted)">' + c.rating + '/5</span>' : '') + '</div>'
-        + '<div class="notes-label">הערות אישיות</div>'
-        + '<textarea class="notes-area" placeholder="מה אהבת? שעות, מנות מומלצות..." onchange="upNote(' + c.id + ',this.value)">' + (c.notes||'') + '</textarea>'
+        + '<div class="cart-hours">🕐 '
+          + (c.hours
+              ? '<span class="hours-text">' + (c.hours).replace(/\n/g,'<br>') + '</span>'
+              : '<span class="hours-empty">שעות לא הוגדרו</span>')
+          + '<button class="edit-hours-btn" onclick="askEditHours(' + c.id + ')" title="ערוך שעות">✏️</button>'
+          + '</div>'
+        + commentsHtml(c.id, c.comments)
         + '<div class="card-footer">'
-          + '<button class="visited-btn' + (c.visited ? ' visited' : '') + '" onclick="toggleVisited(' + c.id + ',this)">' + (c.visited ? '✓ ביקרתי' : '☐ ביקרתי?') + '</button>'
           + footerLinks
-          + '<button class="delete-btn" onclick="askDelete(' + c.id + ')">🗑 מחק</button>'
         + '</div>'
       + '</div>';
     grid.appendChild(el);
@@ -330,11 +523,9 @@ function renderMapList(data) {
     item.className = 'map-item' + (c.visited ? ' is-visited' : '');
     var name = c.name || (c.ig ? igLabel(c.ig) : 'עגלה לא ידועה');
     var links = '';
-    if (c.waze) {
-      links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
-      var llMatch2 = c.waze.match(/ll=([\d.]+),([\d.]+)/);
-      if (llMatch2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + llMatch2[1] + ',' + llMatch2[2] + '\')" style="padding:6px 10px;font-size:0.73rem">🗺 Maps</a>';
-    }
+    var wazeQ2 = c.waze ? c.waze.replace('waze://?q=','').replace('&navigate=yes','') : '';
+    if (c.waze) links += '<a class="waze-btn" href="' + c.waze + '" onclick="openWaze(event,\'' + c.waze + '\')" style="padding:6px 10px;font-size:0.73rem">🚗 Waze</a>';
+    if (wazeQ2) links += '<a class="maps-btn" href="#" onclick="openMaps(event,\'' + wazeQ2 + '\')" style="padding:6px 10px;font-size:0.73rem"><svg width="11" height="15" viewBox="0 0 12 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M6 0C2.69 0 0 2.69 0 6c0 4.2 6 10 6 10s6-5.8 6-10c0-3.31-2.69-6-6-6z" fill="#EA4335"/><circle cx="6" cy="6" r="2.4" fill="white"/></svg>G Maps</a>';
     if (c.ig) links += '<a class="ig-btn" href="' + c.ig + '" onclick="openIG(event,\'' + c.ig + '\')" style="padding:6px 10px;font-size:0.73rem">' + igLabel(c.ig) + '</a>';
     item.innerHTML =
       '<div class="map-dot' + (c.visited ? ' visited' : '') + '"></div>'
@@ -364,6 +555,36 @@ function toggleVisitedFilter() {
   showOnlyVisited = !showOnlyVisited;
   document.getElementById('filter-visited').classList.toggle('active', showOnlyVisited);
   render();
+}
+
+function toggleOpenFilter() {
+  showOnlyOpen = !showOnlyOpen;
+  document.getElementById('filter-open').classList.toggle('active', showOnlyOpen);
+  render();
+}
+
+function toggleDistSort() {
+  sortByDist = !sortByDist;
+  document.getElementById('sort-dist').classList.toggle('active', sortByDist);
+  if (sortByDist && userLat === null) {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(pos) {
+        userLat = pos.coords.latitude;
+        userLng = pos.coords.longitude;
+        render();
+      }, function() {
+        showToast('❌ לא ניתן לקבל מיקום');
+        sortByDist = false;
+        document.getElementById('sort-dist').classList.remove('active');
+      });
+    } else {
+      showToast('❌ דפדפן לא תומך במיקום');
+      sortByDist = false;
+      document.getElementById('sort-dist').classList.remove('active');
+    }
+  } else {
+    render();
+  }
 }
 
 function toggleVisited(id, btn) {
@@ -403,6 +624,55 @@ function upLoc(id, v) {
   if (c) { c.location = v; save(d); }
 }
 
+var pendingHoursId = null;
+function askEditHours(id) {
+  pendingHoursId = id;
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  document.getElementById('f-hours-edit').value = (c && c.hours) || '';
+  document.getElementById('hours-overlay').classList.add('open');
+}
+function closeHoursModal() { document.getElementById('hours-overlay').classList.remove('open'); pendingHoursId = null; }
+function doSaveHours() {
+  if (!pendingHoursId) return;
+  var v = document.getElementById('f-hours-edit').value.trim();
+  var d = load();
+  var c = d.find(function(x) { return x.id === pendingHoursId; });
+  if (c) { c.hours = v; save(d); render(); }
+  closeHoursModal();
+}
+
+function setMainImg(id, url) {
+  var d = load();
+  var c = d.find(function(x) { return x.id === id; });
+  if (!c || !url) return;
+  if (!c.extraImages) c.extraImages = [];
+  if (c.img) c.extraImages.push(c.img);
+  c.extraImages = c.extraImages.filter(function(u) { return u !== url; });
+  c.img = url;
+  c.imgStyle = '';
+  save(d); render();
+}
+
+function uploadImg(id, input) {
+  var file = input.files[0];
+  if (!file) return;
+  showToast('⏳ מעלה תמונה...');
+  var storageRef = firebase.storage().ref('carts/' + id + '/' + Date.now() + '_' + file.name);
+  storageRef.put(file).then(function(snap) {
+    return snap.ref.getDownloadURL();
+  }).then(function(url) {
+    var d = load();
+    var c = d.find(function(x) { return x.id === id; });
+    if (!c) return;
+    if (!c.extraImages) c.extraImages = [];
+    c.extraImages.push(url);
+    save(d); render();
+    showToast('✅ תמונה הועלתה!');
+  }).catch(function() { showToast('❌ שגיאת העלאה'); });
+  input.value = '';
+}
+
 // DELETE
 function askDelete(id) {
   pendingDelId = id;
@@ -422,7 +692,7 @@ function doDelete() {
 function openAddModal() { document.getElementById('add-overlay').classList.add('open'); }
 function closeAddModal() {
   document.getElementById('add-overlay').classList.remove('open');
-  ['f-name','f-loc','f-ig','f-img','f-waze'].forEach(function(id) { document.getElementById(id).value = ''; });
+  ['f-name','f-loc','f-ig','f-img','f-waze','f-hours'].forEach(function(id) { document.getElementById(id).value = ''; });
 }
 function addCart() {
   var name = document.getElementById('f-name').value.trim();
@@ -434,6 +704,7 @@ function addCart() {
     ig: document.getElementById('f-ig').value.trim(),
     img: document.getElementById('f-img').value.trim(),
     waze: document.getElementById('f-waze').value.trim(),
+    hours: document.getElementById('f-hours').value.trim(),
     notes: '', rating: 0, visited: false, unknown: false
   });
   save(d); closeAddModal(); render();
@@ -451,6 +722,7 @@ function showToast(msg) {
 // CLOSE ON BG CLICK
 document.getElementById('add-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeAddModal(); });
 document.getElementById('del-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeDelModal(); });
+document.getElementById('hours-overlay').addEventListener('click', function(e) { if (e.target === e.currentTarget) closeHoursModal(); });
 
 // ── Firebase init ──────────────────────────────────────────────
 firebase.initializeApp({
@@ -463,44 +735,60 @@ firebase.initializeApp({
   appId:             "1:739227192763:web:2a08f92b1fbb79fc27089e"
 });
 
+// Geolocation – silent init, updates distance badges when ready
+if (navigator.geolocation) {
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    userLat = pos.coords.latitude;
+    userLng = pos.coords.longitude;
+    render();
+  }, function() {});
+}
+
 dbRef = firebase.database().ref('carts');
-
-// ── Debug indicator ──
-var dbg = document.createElement('div');
-dbg.id = 'fb-debug';
-dbg.style = 'position:fixed;bottom:10px;left:10px;background:rgba(0,0,0,0.8);color:#fff;font-size:12px;padding:6px 10px;border-radius:8px;z-index:9999;direction:ltr;';
-dbg.textContent = '⏳ Firebase: connecting...';
-document.body.appendChild(dbg);
-
-firebase.database().ref('.info/connected').on('value', function(snap) {
-  dbg.textContent = snap.val() ? '✅ Firebase: connected' : '❌ Firebase: disconnected';
-});
 
 dbRef.on('value', function(snapshot) {
   var raw = snapshot.val();
   if (!raw) {
-    dbg.textContent += ' | writing initial...';
-    dbRef.set(INITIAL).then(function(){ dbg.textContent += ' ✓'; }).catch(function(e){ dbg.textContent += ' ERR: ' + e.message; });
+    dbRef.set(INITIAL).catch(function() { showToast('❌ שגיאת שמירה'); });
     return;
   }
   var d = Array.isArray(raw) ? raw : Object.values(raw).filter(Boolean);
-  // Migration: ensure Shulke has correct imgStyle
+  // Migration: Shulke imgStyle
   var shulke = d.find(function(x) { return x.id === 1; });
-  if (shulke && shulke.imgStyle !== 'object-position:center 90%;transform:scale(2);transform-origin:center 90%;') {
-    shulke.imgStyle = 'object-position:center 90%;transform:scale(2);transform-origin:center 90%;';
+  if (shulke && shulke.imgStyle !== 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;') {
+    shulke.imgStyle = 'object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;';
     delete shulke.imgPos;
     dbRef.set(d);
     return;
   }
-  // Migration: update old waze:// links to coordinate-based https:// URLs
-  var needsWazeMigration = d.some(function(x) { return x.waze && x.waze.indexOf('waze://') === 0; });
-  if (needsWazeMigration) {
-    d.forEach(function(x) { if (WAZE_COORDS[x.id]) x.waze = WAZE_COORDS[x.id]; });
-    if (!d.find(function(x) { return x.id === 15; })) {
-      d.push({id:15, name:"Verde", sub:"ורדה", location:"הרצליה", ig:"", waze:WAZE_COORDS[15], img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=700&q=85", notes:"", rating:0, visited:false, unknown:false});
-    }
-    dbRef.set(d);
-    return;
+  // Migration: add hours to existing carts
+  var hoursMap = {
+    1:'א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור',
+    2:'א׳–ה׳: 07:30–22:30 | ו׳: 07:30–14:00 | ש׳: סגור',
+    3:'א׳–ה׳: 08:00–18:00 | ו׳: 08:00–14:00 | ש׳: סגור',
+    4:'א׳–ה׳: 07:30–19:00 | ו׳: 07:30–15:30 | ש׳: 08:30–19:00',
+    5:'א׳–ו׳: 08:00–23:00 | ש׳: 12:00–23:00',
+    9:'א׳–ה׳: 07:00–18:30 | ו׳: 07:00–15:00 | ש׳: 08:00–15:00',
+    10:'א׳–ה׳: 07:30–20:00 | ו׳: 07:30–14:30 | ש׳: סגור',
+    11:'א׳–ה׳: 08:30–22:00 | ו׳: 08:00–14:30 | ש׳: סגור',
+    12:'א׳–ה׳: 08:00–16:00 | ו׳: 09:00–14:00 | ש׳: סגור',
+    13:'א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור',
+    14:'א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור'
+  };
+  var hoursUpdated = false;
+  d.forEach(function(c) { if (hoursMap[c.id] && !c.hours) { c.hours = hoursMap[c.id]; hoursUpdated = true; } });
+  if (hoursUpdated) { dbRef.set(d); return; }
+  // Migration: add new INITIAL carts missing from Firebase
+  var existingIds = d.map(function(c) { return c.id; });
+  var newCarts = INITIAL.filter(function(ic) { return existingIds.indexOf(ic.id) < 0; });
+  if (newCarts.length) { newCarts.forEach(function(c) { d.push(c); }); dbRef.set(d); return; }
+  // Migration: patch missing ig/hours on id:15
+  var agama = d.find(function(c) { return c.id === 15; });
+  if (agama && (!agama.ig || !agama.hours || !agama.location)) {
+    if (!agama.ig) agama.ig = 'https://www.instagram.com/agama_cafe';
+    if (!agama.hours) agama.hours = 'א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור';
+    if (!agama.location) agama.location = 'אגם הצלילים\nראש העין';
+    dbRef.set(d); return;
   }
   localData = d;
   render();
