@@ -1032,7 +1032,7 @@ function searchWithClaude() {
   document.getElementById('modal-step1').style.display = 'none';
   document.getElementById('modal-step-loading').style.display = 'block';
 
-  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. אם אתה מכיר את המקום ויש לך מידע עליו, החזר: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. אם אינך מכיר את המקום או שאין לך מידע מספיק, החזר: {"found":false}. הכללים כשמוצא: location — בפורמט "כתובת\\nעיר". hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור"; אם לא ידוע השאר ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם יש קואורדינטות ידועות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
+  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. החזר תמיד {"found":true,...} אלא אם השם אינו קשור כלל לקפה או עסק. אל תחזיר found:false רק כי אין לך מידע מלא — מלא את מה שאתה יודע והשאר את השאר ריק. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. הכללים: location — בפורמט "כתובת\\nעיר", אם לא ידוע — ריק. hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור", אם לא ידוע — ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes רק אם יש קואורדינטות ודאיות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
   var userMsg = city
     ? 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
     : 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
