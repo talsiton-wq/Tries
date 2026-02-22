@@ -1032,43 +1032,61 @@ function searchWithClaude() {
   document.getElementById('modal-step1').style.display = 'none';
   document.getElementById('modal-step-loading').style.display = 'block';
 
-  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. החזר תמיד {"found":true,...} אלא אם השם אינו קשור כלל לקפה או עסק. אל תחזיר found:false רק כי אין לך מידע מלא — מלא את מה שאתה יודע והשאר את השאר ריק. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. הכללים: location — בפורמט "כתובת\\nעיר", אם לא ידוע — ריק. hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור", אם לא ידוע — ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes רק אם יש קואורדינטות ודאיות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
+  var systemPrompt = 'אתה עוזר שמחפש מידע עדכני על עגלות קפה ובתי קפה בישראל. חפש בגוגל ושאב מידע אמיתי ועדכני. ענה ב-JSON בלבד, ללא שום טקסט לפני או אחרי. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. location — "כתובת\\nעיר". hours — "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור". waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם נמצאו קואורדינטות. ig — קישור Instagram אם נמצא. אם פרט מסוים לא נמצא בחיפוש, השאר ריק.';
   var userMsg = city
-    ? 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
-    : 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
+    ? 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
+    : 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
 
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': CLAUDE_API_KEY,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true'
-    },
-    body: JSON.stringify({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [{ role: 'user', content: userMsg }]
-    })
-  })
-  .then(function(res) {
-    if (!res.ok) return res.json().then(function(e) { throw new Error((e.error && e.error.message) || 'API error ' + res.status); });
-    return res.json();
-  })
-  .then(function(data) {
-    var text = (data.content && data.content[0] && data.content[0].text) || '';
+  var messages = [{ role: 'user', content: userMsg }];
+
+  function callClaude(msgs) {
+    return fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': CLAUDE_API_KEY,
+        'anthropic-version': '2023-06-01',
+        'anthropic-beta': 'web-search-2025-03-05',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 2048,
+        tools: [{ type: 'web_search_20250305', name: 'web_search' }],
+        system: systemPrompt,
+        messages: msgs
+      })
+    }).then(function(res) {
+      if (!res.ok) return res.json().then(function(e) { throw new Error((e.error && e.error.message) || 'API error ' + res.status); });
+      return res.json();
+    });
+  }
+
+  function handleClaudeResponse(data) {
+    if (data.stop_reason === 'tool_use') {
+      // Claude is searching the web — send back tool results to continue
+      messages.push({ role: 'assistant', content: data.content });
+      var toolResults = (data.content || [])
+        .filter(function(b) { return b.type === 'tool_use'; })
+        .map(function(b) { return { type: 'tool_result', tool_use_id: b.id, content: [] }; });
+      messages.push({ role: 'user', content: toolResults });
+      return callClaude(messages).then(handleClaudeResponse);
+    }
+    var text = '';
+    (data.content || []).forEach(function(b) { if (b.type === 'text') text += b.text; });
     var match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('Claude לא החזיר JSON תקין. נסה שוב.');
     claudeResult = JSON.parse(match[0]);
-    if (claudeResult.found === false) throw new Error('לא נמצא מידע על "' + name + '".\nבדוק את שם העגלה ונסה שוב, או הוסף עיר/אזור.');
     showAddStep2(claudeResult, name, city);
-  })
-  .catch(function(err) {
-    document.getElementById('modal-step-loading').style.display = 'none';
-    document.getElementById('modal-step-error').style.display = 'block';
-    document.getElementById('claude-error-msg').textContent = '❌ ' + (err.message || 'שגיאה לא ידועה');
-  });
+  }
+
+  callClaude(messages)
+    .then(handleClaudeResponse)
+    .catch(function(err) {
+      document.getElementById('modal-step-loading').style.display = 'none';
+      document.getElementById('modal-step-error').style.display = 'block';
+      document.getElementById('claude-error-msg').textContent = '❌ ' + (err.message || 'שגיאה לא ידועה');
+    });
 }
 
 function showAddStep2(result, fallbackName, fallbackCity) {
