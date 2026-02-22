@@ -166,7 +166,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
     <div id="modal-step1">
       <div class="field-label">שם העגלה *</div>
       <input type="text" id="f-name" placeholder="שם העגלה" onkeydown="if(event.key==='Enter')searchWithClaude()" />
-      <div class="field-label">עיר / אזור *</div>
+      <div class="field-label">עיר / אזור <span style="font-weight:300;opacity:0.5">(אופציונלי)</span></div>
       <input type="text" id="f-city" placeholder="תל אביב, הרצליה..." onkeydown="if(event.key==='Enter')searchWithClaude()" />
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
@@ -1028,13 +1028,14 @@ function searchWithClaude() {
   var name = document.getElementById('f-name').value.trim();
   var city = document.getElementById('f-city').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
-  if (!city) { document.getElementById('f-city').focus(); return; }
 
   document.getElementById('modal-step1').style.display = 'none';
   document.getElementById('modal-step-loading').style.display = 'block';
 
-  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. פורמט מדויק: {"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. הכללים: location — בפורמט "כתובת\\nעיר". hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור" ככל האפשר; אם לא ידוע השאר ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם יש קואורדינטות ידועות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
-  var userMsg = 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.';
+  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. אם אתה מכיר את המקום ויש לך מידע עליו, החזר: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. אם אינך מכיר את המקום או שאין לך מידע מספיק, החזר: {"found":false}. הכללים כשמוצא: location — בפורמט "כתובת\\nעיר". hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור"; אם לא ידוע השאר ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם יש קואורדינטות ידועות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
+  var userMsg = city
+    ? 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
+    : 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
 
   fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -1060,6 +1061,7 @@ function searchWithClaude() {
     var match = text.match(/\{[\s\S]*\}/);
     if (!match) throw new Error('Claude לא החזיר JSON תקין. נסה שוב.');
     claudeResult = JSON.parse(match[0]);
+    if (claudeResult.found === false) throw new Error('לא נמצא מידע על "' + name + '".\nבדוק את שם העגלה ונסה שוב, או הוסף עיר/אזור.');
     showAddStep2(claudeResult, name, city);
   })
   .catch(function(err) {
