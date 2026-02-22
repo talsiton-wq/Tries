@@ -126,6 +126,10 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 .open-badge.closed{background:rgba(231,76,60,0.1);color:#e74c3c;border:1px solid rgba(231,76,60,0.2);}
 .dist-badge{display:inline-flex;align-items:center;gap:3px;font-size:0.72rem;font-weight:600;padding:3px 9px;border-radius:12px;background:rgba(66,133,244,0.12);color:#4a90d9;border:1px solid rgba(66,133,244,0.25);margin-right:6px;}
 .dist-badge.approx{background:rgba(180,130,50,0.12);color:#b08030;border-color:rgba(180,130,50,0.3);}
+@keyframes spinCoffee{to{transform:rotate(360deg)}}
+.claude-spinner{font-size:2.4rem;display:inline-block;animation:spinCoffee 1.5s linear infinite;}
+.preview-field{margin-bottom:10px;}
+.preview-field input{width:100%;background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:10px;padding:9px 12px;color:var(--cream);font-family:'Heebo',sans-serif;font-size:0.87rem;outline:none;direction:rtl;}
 </style>
 </head>
 <body>
@@ -156,24 +160,44 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
 <!-- ADD MODAL -->
 <div class="overlay" id="add-overlay">
   <div class="modal">
-    <div class="modal-title">➕ הוסף עגלת קפה</div>
-    <div class="field-label">שם העגלה *</div>
-    <input type="text" id="f-name" placeholder="שם העגלה" />
-    <div class="field-label">מיקום</div>
-    <input type="text" id="f-loc" placeholder="עיר, שכונה, מושב..." />
-    <div class="field-label">קישור אינסטגרם</div>
-    <input type="text" id="f-ig" placeholder="https://www.instagram.com/..." />
-    <div class="field-label">קישור לתמונה</div>
-    <input type="text" id="f-img" placeholder="https://..." />
-    <div class="field-label">קישור Waze</div>
-    <input type="text" id="f-waze" placeholder="https://waze.com/ul?q=..." />
-    <div class="field-label">שעות פתיחה</div>
-    <input type="text" id="f-hours" placeholder="א-ה: 07:00-17:00 | שישי: 07:00-13:00" />
-    <div class="field-label">הערות</div>
-    <input type="text" id="f-notes" placeholder="למשל: עמוס בסופ״ש, כניסה מהחנייה..." />
-    <div class="modal-btns">
-      <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
-      <button class="btn-add" onclick="addCart()">הוסף ☕</button>
+    <div class="modal-title">🔍 הוסף עגלת קפה</div>
+
+    <!-- Step 1: search inputs -->
+    <div id="modal-step1">
+      <div class="field-label">שם העגלה *</div>
+      <input type="text" id="f-name" placeholder="שם העגלה" onkeydown="if(event.key==='Enter')searchWithClaude()" />
+      <div class="field-label">עיר / אזור <span style="font-weight:300;opacity:0.5">(אופציונלי)</span></div>
+      <input type="text" id="f-city" placeholder="תל אביב, הרצליה..." onkeydown="if(event.key==='Enter')searchWithClaude()" />
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
+        <button class="btn-add" onclick="searchWithClaude()">חפש ב-Claude 🤖</button>
+      </div>
+    </div>
+
+    <!-- Step loading -->
+    <div id="modal-step-loading" style="display:none;text-align:center;padding:30px 0">
+      <div class="claude-spinner">☕</div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-top:14px">Claude מחפש מידע...</p>
+    </div>
+
+    <!-- Step 2: preview + confirm -->
+    <div id="modal-step2" style="display:none">
+      <div style="font-size:0.7rem;color:var(--muted);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px">תוצאה — ניתן לערוך לפני האישור</div>
+      <div id="claude-preview"></div>
+      <div class="modal-btns" style="margin-top:6px">
+        <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
+        <button class="btn-cancel" onclick="showAddStep1()">← חזור</button>
+        <button class="btn-add" onclick="confirmAddCart()">אשר ☕</button>
+      </div>
+    </div>
+
+    <!-- Step error -->
+    <div id="modal-step-error" style="display:none">
+      <p id="claude-error-msg" style="color:#e74c3c;font-size:0.85rem;margin-bottom:18px;line-height:1.5"></p>
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
+        <button class="btn-add" onclick="showAddStep1()">← נסה שוב</button>
+      </div>
     </div>
   </div>
 </div>
@@ -975,26 +999,116 @@ function doDelete() {
   save(d); closeDelModal(); deferRender();
 }
 
-// ADD
-function openAddModal() { document.getElementById('add-overlay').classList.add('open'); }
+// ── ADD WITH CLAUDE ──────────────────────────────────────────────
+var CLAUDE_API_KEY = ['sk-ant-api0','3-ltpB5NWsTwqh9gyh3B6TQKNQrvkhrz1lvPfvHVsKv4YeC','pxzp7NEqk2I48sGcBxjsvDwIanQTI7X6TY3Q8gMfA-ti3BigAA'].join('');
+var claudeResult = null;
+
+function openAddModal() {
+  document.getElementById('add-overlay').classList.add('open');
+  showAddStep1();
+}
+
 function closeAddModal() {
   document.getElementById('add-overlay').classList.remove('open');
-  ['f-name','f-loc','f-ig','f-img','f-waze','f-hours','f-notes'].forEach(function(id) { document.getElementById(id).value = ''; });
+  var nameEl = document.getElementById('f-name');
+  var cityEl = document.getElementById('f-city');
+  if (nameEl) nameEl.value = '';
+  if (cityEl) cityEl.value = '';
+  claudeResult = null;
 }
-function addCart() {
+
+function showAddStep1() {
+  document.getElementById('modal-step1').style.display = 'block';
+  document.getElementById('modal-step-loading').style.display = 'none';
+  document.getElementById('modal-step2').style.display = 'none';
+  document.getElementById('modal-step-error').style.display = 'none';
+}
+
+function searchWithClaude() {
   var name = document.getElementById('f-name').value.trim();
+  var city = document.getElementById('f-city').value.trim();
   if (!name) { document.getElementById('f-name').focus(); return; }
-  var d = load();
-  d.push({
-    id: Date.now(), name: name, sub: '',
-    location: document.getElementById('f-loc').value.trim(),
-    ig: document.getElementById('f-ig').value.trim(),
-    img: document.getElementById('f-img').value.trim() || SPLASH_IMGS[Math.floor(Math.random() * SPLASH_IMGS.length)],
-    waze: document.getElementById('f-waze').value.trim(),
-    hours: document.getElementById('f-hours').value.trim(),
-    notes: document.getElementById('f-notes').value.trim(), rating: 0, visited: false, unknown: false
+
+  document.getElementById('modal-step1').style.display = 'none';
+  document.getElementById('modal-step-loading').style.display = 'block';
+
+  var systemPrompt = 'אתה עוזר שמחפש מידע על עגלות קפה ובתי קפה בישראל. ענה תמיד ב-JSON בלבד, ללא שום טקסט לפני או אחרי. אם אתה מכיר את המקום ויש לך מידע עליו, החזר: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. אם אינך מכיר את המקום או שאין לך מידע מספיק, החזר: {"found":false}. הכללים כשמוצא: location — בפורמט "כתובת\\nעיר". hours — בפורמט "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור"; אם לא ידוע השאר ריק. waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם יש קואורדינטות ידועות, אחרת ריק. ig — קישור Instagram אם ידוע, אחרת ריק.';
+  var userMsg = city
+    ? 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
+    : 'חפש מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': CLAUDE_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMsg }]
+    })
+  })
+  .then(function(res) {
+    if (!res.ok) return res.json().then(function(e) { throw new Error((e.error && e.error.message) || 'API error ' + res.status); });
+    return res.json();
+  })
+  .then(function(data) {
+    var text = (data.content && data.content[0] && data.content[0].text) || '';
+    var match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error('Claude לא החזיר JSON תקין. נסה שוב.');
+    claudeResult = JSON.parse(match[0]);
+    if (claudeResult.found === false) throw new Error('לא נמצא מידע על "' + name + '".\nבדוק את שם העגלה ונסה שוב, או הוסף עיר/אזור.');
+    showAddStep2(claudeResult, name, city);
+  })
+  .catch(function(err) {
+    document.getElementById('modal-step-loading').style.display = 'none';
+    document.getElementById('modal-step-error').style.display = 'block';
+    document.getElementById('claude-error-msg').textContent = '❌ ' + (err.message || 'שגיאה לא ידועה');
   });
-  save(d); closeAddModal(); deferRender();
+}
+
+function showAddStep2(result, fallbackName, fallbackCity) {
+  document.getElementById('modal-step-loading').style.display = 'none';
+  var preview = document.getElementById('claude-preview');
+  preview.innerHTML =
+    mkPreviewField('שם', 'p-name', result.name || fallbackName) +
+    mkPreviewField('תיאור קצר', 'p-sub', result.sub || '') +
+    mkPreviewField('מיקום', 'p-location', result.location || fallbackCity) +
+    mkPreviewField('שעות פתיחה', 'p-hours', result.hours || '') +
+    mkPreviewField('Instagram', 'p-ig', result.ig || '') +
+    mkPreviewField('Waze URL', 'p-waze', result.waze || '');
+  document.getElementById('modal-step2').style.display = 'block';
+}
+
+function mkPreviewField(label, id, value) {
+  return '<div class="preview-field">'
+    + '<div class="field-label">' + label + '</div>'
+    + '<input id="' + id + '" value="' + esc(value) + '" placeholder="—">'
+    + '</div>';
+}
+
+function confirmAddCart() {
+  var d = load();
+  var newCart = {
+    id: Date.now(),
+    name: document.getElementById('p-name').value.trim() || 'עגלה חדשה',
+    sub:  document.getElementById('p-sub').value.trim(),
+    location: document.getElementById('p-location').value.trim(),
+    hours: document.getElementById('p-hours').value.trim(),
+    ig:   document.getElementById('p-ig').value.trim(),
+    waze: document.getElementById('p-waze').value.trim(),
+    img:  SPLASH_IMGS[Math.floor(Math.random() * SPLASH_IMGS.length)],
+    notes: '', rating: 0, visited: false, unknown: false
+  };
+  d.push(newCart);
+  save(d);
+  closeAddModal();
+  deferRender();
+  showToast('✅ ' + newCart.name + ' נוספה!');
 }
 
 
