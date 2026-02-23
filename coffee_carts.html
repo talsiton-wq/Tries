@@ -1057,7 +1057,13 @@ function searchWithClaude() {
         messages: msgs
       })
     }).then(function(res) {
-      if (!res.ok) return res.json().then(function(e) { throw new Error((e.error && e.error.message) || 'API error ' + res.status); });
+      if (!res.ok) return res.json().then(function(e) {
+        var msg = (e.error && e.error.message) || '';
+        if (res.status === 429 || msg.toLowerCase().indexOf('rate limit') >= 0 || msg.toLowerCase().indexOf('overloaded') >= 0) {
+          throw new Error('rate_limit');
+        }
+        throw new Error(msg || 'API error ' + res.status);
+      });
       return res.json();
     });
   }
@@ -1085,7 +1091,12 @@ function searchWithClaude() {
     .catch(function(err) {
       document.getElementById('modal-step-loading').style.display = 'none';
       document.getElementById('modal-step-error').style.display = 'block';
-      document.getElementById('claude-error-msg').textContent = '❌ ' + (err.message || 'שגיאה לא ידועה');
+      var msg = err.message || '';
+      if (msg === 'rate_limit') {
+        document.getElementById('claude-error-msg').textContent = '⏳ הגעת למגבלת השימוש ב-API. המתן כמה דקות ונסה שוב.';
+      } else {
+        document.getElementById('claude-error-msg').textContent = '❌ ' + (msg || 'שגיאה לא ידועה');
+      }
     });
 }
 
