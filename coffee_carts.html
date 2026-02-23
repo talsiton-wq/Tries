@@ -1119,6 +1119,25 @@ function showAddStep2(result, fallbackName, fallbackCity) {
     mkPreviewField('Instagram', 'p-ig', result.ig || '') +
     mkPreviewField('Waze URL', 'p-waze', wazeUrl);
   document.getElementById('modal-step2').style.display = 'block';
+
+  // If Claude returned a q= address URL, geocode it live to get exact ll= coordinates
+  var qMatch = wazeUrl.match(/[?&]q=([^&]+)/);
+  if (qMatch && !wazeUrl.match(/ll=/)) {
+    var addr = decodeURIComponent(qMatch[1].replace(/\+/g, ' '));
+    if (addr.indexOf('ישראל') < 0) addr += ' ישראל';
+    var wazeField = document.getElementById('p-waze');
+    wazeField.style.opacity = '0.5';
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=il&q=' + encodeURIComponent(addr))
+      .then(function(r) { return r.json(); })
+      .then(function(results) {
+        if (!results || !results[0]) return;
+        var lat = parseFloat(results[0].lat).toFixed(7);
+        var lng = parseFloat(results[0].lon).toFixed(7);
+        wazeField.value = 'https://waze.com/ul?ll=' + lat + ',' + lng + '&navigate=yes';
+        wazeField.style.opacity = '1';
+      })
+      .catch(function() { wazeField.style.opacity = '1'; });
+  }
 }
 
 function mkPreviewField(label, id, value) {
