@@ -1032,10 +1032,10 @@ function searchWithClaude() {
   document.getElementById('modal-step1').style.display = 'none';
   document.getElementById('modal-step-loading').style.display = 'block';
 
-  var systemPrompt = 'אתה עוזר שמחפש מידע עדכני על עגלות קפה ובתי קפה בישראל. חפש בגוגל ושאב מידע אמיתי ועדכני. ענה ב-JSON בלבד, ללא שום טקסט לפני או אחרי. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. location — "כתובת\\nעיר". hours — "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור". waze — קישור waze.com/ul?ll=LAT,LNG&navigate=yes אם נמצאו קואורדינטות. ig — קישור Instagram אם נמצא. אם פרט מסוים לא נמצא בחיפוש, השאר ריק.';
+  var systemPrompt = 'אתה עוזר שמחפש מידע עדכני על עגלות קפה ובתי קפה בישראל. חפש בגוגל ושאב מידע אמיתי ועדכני. ענה ב-JSON בלבד, ללא שום טקסט לפני או אחרי. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. location — "עיר,רחוב" (לדוגמה: "תל אביב,אבן גבירול 26"). hours — "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור". waze — חובה מוחלטת! חפש בגוגל את הכתובת המדויקת של העסק וקבל את הקואורדינטות (latitude, longitude) שלו. בנה קישור בפורמט: https://waze.com/ul?ll=LAT,LNG&navigate=yes עם הערכים המדויקים של LAT ו-LNG. לדוגמה: https://waze.com/ul?ll=32.0853,34.7818&navigate=yes. אסור להחזיר waze ריק — חפש את הקואורדינטות! ig — קישור Instagram אם נמצא. אם פרט מסוים לא נמצא בחיפוש, השאר ריק (חוץ מwaze שחובה עם קואורדינטות).';
   var userMsg = city
-    ? 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. החזר JSON בלבד.'
-    : 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. החזר JSON בלבד.';
+    ? 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" באזור ' + city + '. מצא את הכתובת המדויקת וקבל קואורדינטות GPS (latitude, longitude) לקישור Waze. החזר JSON בלבד.'
+    : 'חפש בגוגל מידע על עגלת קפה / בית קפה בשם "' + name + '" בישראל. מצא את הכתובת המדויקת וקבל קואורדינטות GPS (latitude, longitude) לקישור Waze. החזר JSON בלבד.';
 
   var messages = [{ role: 'user', content: userMsg }];
 
@@ -1092,13 +1092,18 @@ function searchWithClaude() {
 function showAddStep2(result, fallbackName, fallbackCity) {
   document.getElementById('modal-step-loading').style.display = 'none';
   var preview = document.getElementById('claude-preview');
+  var loc = result.location || fallbackCity || '';
+  var wazeUrl = result.waze || '';
+  if (!wazeUrl && loc) {
+    wazeUrl = 'https://waze.com/ul?q=' + encodeURIComponent(loc + ' ישראל') + '&navigate=yes';
+  }
   preview.innerHTML =
     mkPreviewField('שם', 'p-name', result.name || fallbackName) +
     mkPreviewField('תיאור קצר', 'p-sub', result.sub || '') +
-    mkPreviewField('מיקום', 'p-location', result.location || fallbackCity) +
+    mkPreviewField('מיקום', 'p-location', loc) +
     mkPreviewField('שעות פתיחה', 'p-hours', result.hours || '') +
     mkPreviewField('Instagram', 'p-ig', result.ig || '') +
-    mkPreviewField('Waze URL', 'p-waze', result.waze || '');
+    mkPreviewField('Waze URL', 'p-waze', wazeUrl);
   document.getElementById('modal-step2').style.display = 'block';
 }
 
