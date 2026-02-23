@@ -249,7 +249,8 @@ var WAZE_COORDS = {
   13: "https://waze.com/ul?ll=32.1395959,34.9062955&navigate=yes",
   14: "https://waze.com/ul?ll=32.13361,34.91111&navigate=yes",
   15: "https://waze.com/ul?ll=32.1000953,34.9638264&navigate=yes",
-  16: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes"
+  16: "https://waze.com/ul?ll=32.1754533,34.831469&navigate=yes",
+  17: "https://waze.com/ul?q=בית+העם+15+רמות+השבים&navigate=yes"
 };
 var INITIAL = [
   {id:1,  name:"שולק׳ה",        sub:"Shulke Coffee",                  location:"מרכז לב, חופית\nליד כביש 2",              ig:"https://www.instagram.com/shulke.coffee/",        waze:WAZE_COORDS[1],  img:"IMG_2464.jpeg",                                                                       imgStyle:"object-position:65% 80%;transform:scale(2);transform-origin:65% 80%;", hours:"א׳–ה׳: 07:00–14:00 | ו׳: 07:00–14:00 | ש׳: סגור",                                              notes:"", rating:0, visited:false, unknown:false},
@@ -264,7 +265,8 @@ var INITIAL = [
   {id:13, name:"גילטי",          sub:"GILTI — עגלת קפה ומאפייה",       location:"מושב עדנים\nליד מגרש הכדורסל",           ig:"https://www.instagram.com/gilti_family_bakery/", waze:WAZE_COORDS[13], img:"https://images.unsplash.com/photo-1481391319762-47dff72954d9?w=700&q=85",            hours:"א׳–ה׳: 08:00–19:00 | ו׳: 08:00–14:00 | ש׳–ר׳: סגור",                                  notes:"", rating:0, visited:false, unknown:false},
   {id:14, name:"אסתריקה",        sub:"Esterika Truck על הירקון",        location:"מתחם המועצה האזורית\nדרום השרון",         ig:"https://www.instagram.com/esterika_cafe/",        waze:WAZE_COORDS[14], img:"https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=700&q=85",            hours:"א׳: 07:30–14:30 | ב׳–ה׳: 07:30–17:00 | ו׳: 07:30–14:30 | ש׳: 08:00–15:00 | ר׳: סגור", notes:"", rating:0, visited:false, unknown:false},
   {id:15, name:"אגמא קפה",       sub:"Agama Coffee",                    location:"אגם הצלילים\nראש העין",                   ig:"https://www.instagram.com/agama_cafe",            waze:WAZE_COORDS[15], img:"https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=700&q=85",               hours:"א׳–ה׳: 08:00–21:00 | ו׳: 08:00–14:30 | ש׳: סגור",                                      notes:"", rating:0, visited:false, unknown:false},
-  {id:16, name:"Verde",           sub:"ורדה",                           location:"הרצליה",                                  ig:"https://www.instagram.com/verde.bake.wine?igsh=MTFveXJrbGEzbjJlag==",                        waze:WAZE_COORDS[16], img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=700&q=85",            hours:"א׳–ה׳: 06:30–23:00 | ו׳: 06:30–16:00 | ש׳: 07:00–23:00",                               notes:"", rating:0, visited:false, unknown:false}
+  {id:16, name:"Verde",           sub:"ורדה",                           location:"הרצליה",                                  ig:"https://www.instagram.com/verde.bake.wine?igsh=MTFveXJrbGEzbjJlag==",                        waze:WAZE_COORDS[16], img:"https://images.unsplash.com/photo-1497935586351-b67a49e012bf?w=700&q=85",            hours:"א׳–ה׳: 06:30–23:00 | ו׳: 06:30–16:00 | ש׳: 07:00–23:00",                               notes:"", rating:0, visited:false, unknown:false},
+  {id:17, name:"רמותה",           sub:"עגלת קפה",                       location:"בית העם 15\nרמות השבים",                  ig:"https://www.instagram.com/ramota_cafe/",          waze:WAZE_COORDS[17], img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=700&q=85",            hours:"א׳–ה׳: 08:00–20:00 | ו׳: 08:00–15:00 | ש׳: סגור",                                      notes:"", rating:0, visited:false, unknown:false}
 ];
 
 var filterVal = '';
@@ -396,6 +398,7 @@ var CITY_COORDS = {
   // שרון והמרכז
   'הרצליה':         {lat:32.1663, lng:34.8434},
   'הרצליה פיתוח':   {lat:32.1500, lng:34.8000},
+  'רמות השבים':     {lat:32.1657, lng:34.8831},
   'ראש העין':       {lat:32.0956, lng:34.9551},
   'אבן יהודה':      {lat:32.2685, lng:34.8899},
   'חרות':           {lat:32.2614, lng:34.9394},
