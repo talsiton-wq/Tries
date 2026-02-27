@@ -170,6 +170,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
       <input type="text" id="f-city" placeholder="תל אביב, הרצליה..." onkeydown="if(event.key==='Enter')searchWithClaude()" />
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
+        <button class="btn-cancel" onclick="showManualAdd()">✏️ ידנית</button>
         <button class="btn-add" onclick="searchWithClaude()">חפש ב-Claude 🤖</button>
       </div>
     </div>
@@ -196,6 +197,7 @@ h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,5vw,3rem);color:var
       <p id="claude-error-msg" style="color:#e74c3c;font-size:0.85rem;margin-bottom:18px;line-height:1.5"></p>
       <div class="modal-btns">
         <button class="btn-cancel" onclick="closeAddModal()">ביטול</button>
+        <button class="btn-cancel" onclick="showManualAdd()">✏️ הוסף ידנית</button>
         <button class="btn-add" onclick="showAddStep1()">← נסה שוב</button>
       </div>
     </div>
@@ -1027,6 +1029,14 @@ function showAddStep1() {
   document.getElementById('modal-step-error').style.display = 'none';
 }
 
+function showManualAdd() {
+  var name = document.getElementById('f-name').value.trim();
+  var city = document.getElementById('f-city').value.trim();
+  document.getElementById('modal-step1').style.display = 'none';
+  document.getElementById('modal-step-error').style.display = 'none';
+  showAddStep2({}, name, city);
+}
+
 function searchWithClaude() {
   var name = document.getElementById('f-name').value.trim();
   var city = document.getElementById('f-city').value.trim();
@@ -1060,7 +1070,11 @@ function searchWithClaude() {
     }).then(function(res) {
       if (!res.ok) return res.json().then(function(e) {
         var msg = (e.error && e.error.message) || '';
-        if (res.status === 429 || msg.toLowerCase().indexOf('rate limit') >= 0 || msg.toLowerCase().indexOf('overloaded') >= 0) {
+        var msgL = msg.toLowerCase();
+        if (res.status === 402 || msgL.indexOf('credit') >= 0 || msgL.indexOf('billing') >= 0 || msgL.indexOf('quota') >= 0) {
+          throw new Error('no_credits');
+        }
+        if (res.status === 429 || msgL.indexOf('rate limit') >= 0 || msgL.indexOf('overloaded') >= 0) {
           throw new Error('rate_limit');
         }
         throw new Error(msg || 'API error ' + res.status);
@@ -1093,8 +1107,10 @@ function searchWithClaude() {
       document.getElementById('modal-step-loading').style.display = 'none';
       document.getElementById('modal-step-error').style.display = 'block';
       var msg = err.message || '';
-      if (msg === 'rate_limit') {
-        document.getElementById('claude-error-msg').textContent = '⏳ הגעת למגבלת השימוש ב-API. המתן כמה דקות ונסה שוב.';
+      if (msg === 'no_credits') {
+        document.getElementById('claude-error-msg').textContent = '💳 נגמרו הקרדיטים ב-API. לחץ "הוסף ידנית" למילוי עצמי.';
+      } else if (msg === 'rate_limit') {
+        document.getElementById('claude-error-msg').textContent = '⏳ הגעת למגבלת השימוש ב-API. המתן כמה דקות, או הוסף ידנית.';
       } else {
         document.getElementById('claude-error-msg').textContent = '❌ ' + (msg || 'שגיאה לא ידועה');
       }
