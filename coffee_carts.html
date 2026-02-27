@@ -1035,10 +1035,8 @@ function searchWithClaude() {
   document.getElementById('modal-step1').style.display = 'none';
   document.getElementById('modal-step-loading').style.display = 'block';
 
-  var systemPrompt = 'אתה עוזר שמחפש מידע עדכני על עגלות קפה ובתי קפה בישראל. חפש בגוגל ושאב מידע אמיתי ועדכני. ענה ב-JSON בלבד, ללא שום טקסט לפני או אחרי. פורמט: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. location — "עיר,רחוב" (לדוגמה: "תל אביב,אבן גבירול 26"). hours — "א׳–ה׳: HH:MM–HH:MM | ו׳: HH:MM–HH:MM | ש׳: סגור". waze — חובה מוחלטת! חפש את שם העסק ב-Google Maps וחלץ קואורדינטות מדויקות מה-URL בפורמט @LAT,LNG,zoom. אם מצאת קואורדינטות מדויקות של העסק עצמו (לא של הרחוב): https://waze.com/ul?ll=LAT,LNG&navigate=yes. אם לא מצאת קואורדינטות מדויקות — בנה קישור עם שם העסק והכתובת: https://waze.com/ul?q=שם+כתובת+עיר+ישראל&navigate=yes (כך Waze ימצא את העסק בעצמו). חובה להחזיר waze שאינו ריק! ig — קישור Instagram אם נמצא. אם פרט מסוים לא נמצא בחיפוש, השאר ריק (חוץ מwaze שחובה).';
-  var userMsg = city
-    ? 'חפש ב-Google Maps את עגלת הקפה / בית הקפה בשם "' + name + '" באזור ' + city + '. מצא את ה-URL של Google Maps וחלץ ממנו את הקואורדינטות המדויקות (@LAT,LNG) של העסק. החזר JSON בלבד.'
-    : 'חפש ב-Google Maps את עגלת הקפה / בית הקפה בשם "' + name + '" בישראל. מצא את ה-URL של Google Maps וחלץ ממנו את הקואורדינטות המדויקות (@LAT,LNG) של העסק. החזר JSON בלבד.';
+  var systemPrompt = 'ענה JSON בלבד: {"found":true,"name":"","sub":"","location":"","hours":"","waze":"","ig":""}. location="עיר,רחוב". hours="א׳–ה׳:HH:MM–HH:MM|ו׳:HH:MM–HH:MM|ש׳:סגור". waze=https://waze.com/ul?ll=LAT,LNG&navigate=yes (חלץ LAT,LNG מ-URL של Google Maps בפורמט @LAT,LNG). ig=קישור Instagram. שדה לא נמצא — ריק.';
+  var userMsg = '"' + name + '" ' + (city || 'ישראל') + ' — חפש Google Maps, החזר JSON.';
 
   var messages = [{ role: 'user', content: userMsg }];
 
